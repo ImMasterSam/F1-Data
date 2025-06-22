@@ -29,6 +29,7 @@ export type race_normal_type = {
     SecondPractice: datetime_type;
     ThirdPractice: datetime_type;
     Qualifying: datetime_type;
+    status: 'finish' | 'next' | 'racing' | 'yetStart';
 }
 
 export type race_sprint_type = {
@@ -43,6 +44,7 @@ export type race_sprint_type = {
     SprintQualifying: datetime_type;
     Sprint: datetime_type;
     Qualifying: datetime_type;
+    status: 'finish' | 'next' | 'racing' | 'yetStart';
 }
 
 export type race_type = race_normal_type | race_sprint_type

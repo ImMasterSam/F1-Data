@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
-import type { race_type } from "./RaceTypes";
+import type { race_type } from "./lib/RaceTypes";
 import ScheduleBlock from "./ScheduleBlock";
 import './Schedule.css'
+import { setRaceStatus } from "./lib/ScheduleHandler";
 
 const requestOption = {
     method: 'GET',
     redirect: "follow" as RequestRedirect
-}
+} 
 
 async function getScheduleList(year: number): Promise<Array<race_type>> {
   
@@ -18,8 +19,10 @@ async function getScheduleList(year: number): Promise<Array<race_type>> {
   }
 
   const jsonContent = await response.json()
-  const scheduleList: Array<any> = jsonContent.MRData.RaceTable.Races
+  let scheduleList: Array<any> = jsonContent.MRData.RaceTable.Races
   console.log(scheduleList)
+
+  scheduleList = setRaceStatus(scheduleList)
 
   return scheduleList
 }
