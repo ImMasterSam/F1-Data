@@ -25,7 +25,7 @@ function DriverStandingTable({driverStanding: driverStanding}: Props) {
               return driver
               ? <tr key={driver.position}>
                 <td>{driver.position}</td>
-                <td className="f1-style" style={{textAlign: 'left'}}>
+                <td className="f1-style driverName-field" style={{textAlign: 'left'}}>
                   <span>
                     {driver.Driver.givenName + ' '}
                     <span style={{color: team_theme[driver.Constructors[0].constructorId], fontWeight: 'bold'}}>

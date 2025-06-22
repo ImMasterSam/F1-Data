@@ -24,7 +24,7 @@ function ConstructorStandingTable({constructorStanding}: Props) {
               return constructor 
               ? <tr key={constructor.position}>
                 <td>{constructor.position}</td>
-                <td>
+                <td className="constructorName-field">
                   <img src={`${import.meta.env.BASE_URL}/team-logo/${constructor.Constructor.constructorId}.png`} alt={constructor.Constructor.constructorId} className="team-logo" />
                   <p className="f1-style">{constructor.Constructor.name}</p>
                 </td>

@@ -48,6 +48,7 @@ h2 {
     text-decoration: none;
     color: white;
     text-align: center;
+    font-size: large;
     border-radius: 5px;
     transition: all 0.3s;
 }
