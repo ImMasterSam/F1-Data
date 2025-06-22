@@ -39,6 +39,7 @@ tbody > tr {
 tbody > tr:hover {
     background-color: #464646;
     font-size: large;
+    cursor: pointer;
 }
 
 tbody > tr:last-child { 
