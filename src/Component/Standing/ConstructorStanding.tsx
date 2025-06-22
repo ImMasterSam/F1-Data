@@ -26,16 +26,18 @@ async function getConstructorStanding(year: number): Promise<Array<constructorSt
 function ConstructorStanding() {
   
   const [constructorStanding, setConstructorStanding] = useState<Array<constructorStanding_type>>([])
+  const [errMessage, setErrMessage] = useState<string>('')
 
   useEffect(() => {
     getConstructorStanding(2025).then((data) => {
       setConstructorStanding(data)
-    })
+    }).catch((error) => {setErrMessage(error)})
   }, [])
 
   return (
     <>
-      <ConstructorStandingTable constructorStanding={constructorStanding}/>
+      {errMessage ? <h3>{errMessage}</h3>
+      : <ConstructorStandingTable constructorStanding={constructorStanding}/>}
     </>
   )
 }

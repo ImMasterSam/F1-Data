@@ -49,8 +49,24 @@ h2 {
     color: white;
     text-align: center;
     border-radius: 5px;
+    transition: all 0.3s;
 }
 
 .side-bar > a:hover {
     background-color: #464646;
+    scale: 1.05;
+}
+
+
+@font-face {
+    font-family: 'F1';
+    src: url('/Fonts/Formula1-Bold_web_0.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'F1';
+    src: url('/Fonts/Formula1-Regular_web_0.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
 }

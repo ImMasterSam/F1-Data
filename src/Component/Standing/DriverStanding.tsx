@@ -25,18 +25,19 @@ async function getDriverStanding(year: number): Promise<Array<driverStanding_typ
 
 function DriverStanding() {
 
-  
   const [driverStanding, setDriverStanding] = useState<Array<driverStanding_type>>([])
+  const [errMessage, setErrMessage] = useState<string>('')
 
   useEffect(() => {
     getDriverStanding(2025).then((data) => {
       setDriverStanding(data)
-    })
+    }).catch((error) => {setErrMessage(error)})
   }, [])
 
   return (
     <>
-      <DriverStandingTable driverStanding={driverStanding}/>
+      {errMessage ? <h3>{errMessage}</h3>
+      : <DriverStandingTable driverStanding={driverStanding}/>}
     </>
   )
 }

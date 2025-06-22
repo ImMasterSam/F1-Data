@@ -22,7 +22,8 @@ function DriverStandingTable({driverStanding: driverStanding}: Props) {
 
           <tbody>
             {driverStanding.map((driver) => {
-              return <tr key={driver.position}>
+              return driver
+              ? <tr key={driver.position}>
                 <td>{driver.position}</td>
                 <td className="f1-style" style={{textAlign: 'left'}}>
                   <span>
@@ -35,6 +36,7 @@ function DriverStandingTable({driverStanding: driverStanding}: Props) {
                 <td>{driver.wins}</td>
                 <td style={{fontWeight: 'bold'}}>{driver.points}</td>
               </tr>
+              : <tr>Loading ...</tr>
             })}   
           </tbody>
 

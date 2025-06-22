@@ -43,19 +43,6 @@ table tr:last-child {
     border-radius: 50%;
 }
 
-@font-face {
-    font-family: 'F1';
-    src: url('/Fonts/Formula1-Bold_web_0.ttf') format('truetype');
-    font-weight: bold;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'F1';
-    src: url('/Fonts/Formula1-Regular_web_0.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
 .f1-style {
     font-family: 'F1';
 }
