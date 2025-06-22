@@ -15,14 +15,12 @@ h1 {
     border-bottom: 1px solid gray;
     text-align: left;
     padding: 20px 20px;
-    margin: 5px;
     display: flex;
     align-items: center;
 }
 
 h2 {
     width: 100%;
-    border-bottom: 1px solid gray;
     text-align: left;
     padding: 10px 20px;
     margin: 5px;
