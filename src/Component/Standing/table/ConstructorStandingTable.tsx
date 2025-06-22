@@ -23,9 +23,12 @@ function ConstructorStandingTable({constructorStanding}: Props) {
             {constructorStanding.map((constructor) => {
               return <tr key={constructor.position}>
                 <td>{constructor.position}</td>
-                <td>{constructor.Constructor.name}</td>
+                <td>
+                  <img src={`/team logo/${constructor.Constructor.constructorId}.png`} alt={constructor.Constructor.constructorId} className="team-logo" />
+                  <p className="f1-style">{constructor.Constructor.name}</p>
+                </td>
                 <td>{constructor.wins}</td>
-                <td>{constructor.points}</td>
+                <td style={{fontWeight: 'bold'}}>{constructor.points}</td>
               </tr>
             })}   
           </tbody>

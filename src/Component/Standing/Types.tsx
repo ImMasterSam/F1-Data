@@ -27,6 +27,7 @@ export type constructorStanding_type = {
 
 export type driverStanding_type = {
   Driver: driver_type;
+  Constructors: constructor_type[];
   points: number;
   position: number;
   positiontext: string;
