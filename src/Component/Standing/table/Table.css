@@ -1,0 +1,25 @@
+table {
+    width: 100%;
+    margin: 0 10px;
+    padding: 20px;
+    border-radius: 10px;
+    border-collapse: collapse;
+}
+
+th {
+    padding: 15px;
+    border-bottom: gray 2px solid;
+}
+
+td {
+    text-align: center;
+    padding: 5px;
+}
+
+tr {
+    border-bottom: #464646 0.5px solid;
+}
+
+table tr:last-child { 
+    border-bottom: none; 
+}
