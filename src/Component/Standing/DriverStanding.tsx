@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { driverStanding_type } from './Types.tsx';
+import type { driverStanding_type } from './StandingTypes.tsx';
 import DriverStandingTable from './table/DriverStandingTable.tsx';
 
 const requestOption = {

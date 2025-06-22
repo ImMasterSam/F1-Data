@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { constructorStanding_type } from './Types.tsx';
+import type { constructorStanding_type } from './StandingTypes.tsx';
 import ConstructorStandingTable from './table/ConstructorStandingTable.tsx';
 
 const requestOption = {
@@ -24,7 +24,6 @@ async function getConstructorStanding(year: number): Promise<Array<constructorSt
 }
 
 function ConstructorStanding() {
-
   
   const [constructorStanding, setConstructorStanding] = useState<Array<constructorStanding_type>>([])
 
