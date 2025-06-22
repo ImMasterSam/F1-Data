@@ -1,5 +1,3 @@
-import type { datetime_type } from "./RaceTypes";
-
 export const getTimeString = () => {
 
   let currentTime = new Date()
