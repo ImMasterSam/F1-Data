@@ -3,3 +3,13 @@ body {
     color: white;
     font-family: sans-serif;
 }
+
+h1 {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.standing-table {
+    display: flex;
+    flex-direction: row;
+}
