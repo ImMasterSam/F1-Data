@@ -7,7 +7,7 @@ function App() {
 
   return (
     <>
-      <h1>F1 Dashboard</h1>
+      <h1>F1 Data Analysis</h1>
       <div className='main-container'>
         <nav className='side-bar'>
           <a href="/">Home</a>
