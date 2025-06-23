@@ -20,7 +20,7 @@ function ConstructorStandingTableBody({constructorStanding}: Props) {
   return <tbody>
     {constructorStanding.map((constructor) => {
       return constructor 
-      ? <tr key={constructor.position}>
+      ? <tr key={constructor.position} onClick={() => {window.open(constructor.Constructor.url)}}>
         <td>{constructor.position}</td>
         <td className="constructorName-field">
           <img src={`${import.meta.env.BASE_URL}/team-logo/${constructor.Constructor.constructorId}.png`} alt={constructor.Constructor.constructorId} className="team-logo" />
