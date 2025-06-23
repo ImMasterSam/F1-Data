@@ -1,5 +1,5 @@
 import ReactCountryFlag from "react-country-flag";
-import type { race_type } from "./lib/RaceTypes"
+import type { race_type } from "./lib/RaceTypes";
 import { Country } from "./lib/CountryCode";
 import { getDateRange } from "./lib/TimeHandler";
 
@@ -8,7 +8,7 @@ type Props = {
 }
 
 function ScheduleBlock({race}: Props) {
-  return <div className={`race-block ${race.status}`}>
+  return <div className={`race-block ${race.status}`} onClick={() => {window.open(race.url, '_blank')}}>
     <div className="race-info">
       <div className="race-header">
         <ReactCountryFlag countryCode={Country[race.Circuit.Location.country]} 

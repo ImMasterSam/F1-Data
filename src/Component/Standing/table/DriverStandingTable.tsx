@@ -6,39 +6,47 @@ type Props = {
   driverStanding: Array<driverStanding_type>
 }
 
-function DriverStandingTable({driverStanding: driverStanding}: Props) {
+function DriverStandingTableHeader() {
+  return <thead>
+    <tr>
+      <th>Rank</th>
+      <th>Driver</th>
+      <th>Win(s)</th>
+      <th>Points</th>
+    </tr>
+  </thead>
+}
+
+function DriverStandingTableBody({driverStanding}: Props) {
+  return <tbody>
+    {driverStanding.map((driver) => {
+      return driver
+      ? <tr key={driver.position}>
+        <td>{driver.position}</td>
+        <td className="f1-style driverName-field" style={{textAlign: 'left'}}>
+          <span>
+            {driver.Driver.givenName + ' '}
+            <span style={{color: team_theme[driver.Constructors[0].constructorId], fontWeight: 'bold'}}>
+              {driver.Driver.familyName.toUpperCase()}
+            </span>
+          </span>
+        </td>
+        <td>{driver.wins}</td>
+        <td style={{fontWeight: 'bold'}}>{driver.points}</td>
+      </tr>
+      : <tr><td colSpan={4}>Loading ...</td></tr>
+    })}   
+  </tbody>
+}
+
+function DriverStandingTable({driverStanding}: Props) {
   return (
     <div className="standings">
       <h2 className="table-title">Driver Championship Standings</h2>
       <table className="driverStanding-table">
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Driver</th>
-              <th>Win(s)</th>
-              <th>Points</th>
-            </tr>
-          </thead>
+          <DriverStandingTableHeader />          
 
-          <tbody>
-            {driverStanding.map((driver) => {
-              return driver
-              ? <tr key={driver.position}>
-                <td>{driver.position}</td>
-                <td className="f1-style driverName-field" style={{textAlign: 'left'}}>
-                  <span>
-                    {driver.Driver.givenName + ' '}
-                    <span style={{color: team_theme[driver.Constructors[0].constructorId], fontWeight: 'bold'}}>
-                      {driver.Driver.familyName.toUpperCase()}
-                    </span>
-                  </span>
-                </td>
-                <td>{driver.wins}</td>
-                <td style={{fontWeight: 'bold'}}>{driver.points}</td>
-              </tr>
-              : <tr>Loading ...</tr>
-            })}   
-          </tbody>
+          <DriverStandingTableBody driverStanding={driverStanding}/>
 
       </table>
     </div>

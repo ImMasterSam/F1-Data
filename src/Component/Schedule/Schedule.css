@@ -26,12 +26,18 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    transition: all 0.2s;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .race-block:hover {
     background-color: #282828;
-    font-size: 105%;
+}
+
+.race-block:hover h3 {
+    font-size: 120%;
+    text-decoration: underline;
+    transition: all 0.2s ease;
 }
 
 .race-date > p {
