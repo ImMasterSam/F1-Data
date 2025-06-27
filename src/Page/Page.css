@@ -5,6 +5,14 @@
     flex-direction: column;
 }
 
+.live-timing {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+
 .standing-table {
     width: 100%;
     height: 100%;
