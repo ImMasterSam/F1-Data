@@ -2,6 +2,11 @@ import json
 import urllib.parse
 import websocket
 import requests
+import asyncio
+from time import sleep
+
+ws_global: websocket.WebSocketApp = None
+data_global = None
 
 def negotiate(hub):
 
@@ -20,6 +25,8 @@ def negotiate(hub):
     
 
 def connect_wss():
+
+    global ws_global
     
     name_json = [{"name": "Streaming"}]
     hub = urllib.parse.quote(json.dumps(name_json))
@@ -42,14 +49,31 @@ def connect_wss():
         subscribe_msg = {
             "H": "Streaming",
             "M": "Subscribe",
-            "A": [["Heartbeat"]],
+            "A": [["Heartbeat", "DriverList", "TimingData", "TimingStats", "WeatherData", "TrackStatus"]],
             "I": 1
         }
         ws.send(json.dumps(subscribe_msg))
         
 
-    def on_message(ws, message):
-        print("received", message)
+    def on_message(ws: websocket.WebSocketApp, message):
+        global data_global
+
+        print("received Message: ", message[:100], "...")  # Print first 100 characters for brevity
+        if message.startswith("{\"R\":"):
+            print("Load to global data")
+            data_global = json.loads(message).get('R')
+        # print("Data received:", data_global)
+
+        sleep(0.2)
+
+        subscribe_msg = {
+            "H": "Streaming",
+            "M": "Subscribe",
+            "A": [["DriverList", "TimingData", "TimingStats", "WeatherData", "TrackStatus"]],
+            "I": 1
+        }
+        ws.send(json.dumps(subscribe_msg))
+        print("Sent subscribe message")
 
     def on_error(ws, error):
         print("error:", error)
@@ -65,6 +89,7 @@ def connect_wss():
         on_error=on_error,
         on_close=on_close
     )
+    ws_global = ws
     ws.run_forever(ping_interval= 0.5)
 
 if __name__ == "__main__":

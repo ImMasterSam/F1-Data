@@ -4,11 +4,25 @@ from fastf1.core import Session, Lap
 
 import pandas as pd
 import datetime
+import threading
+import time
+import asyncio
+
+import wss
+
+def get_live_timing_data():
+    '''Get live timing data from websocket connection'''
+    subscribe_msg = {
+        "H": "Streaming",
+        "M": "Subscribe",
+        "A": [["Heartbeat"]],
+        "I": 1
+    }
 
 def get_current_session(current_time: datetime.datetime) -> Session:
     """Get the current live session""" 
     schedule = fastf1.get_event_schedule(current_time.year)
-    target_time = current_time + datetime.timedelta(minutes=15)  # Look for sessions starting within the last 15 minutes
+    target_time = current_time + datetime.timedelta(minutes=5)  # Look for sessions starting within the last 15 minutes
 
     for round, event in schedule[::-1].iterrows():
         # print(event)
@@ -81,8 +95,20 @@ def get_live_timing():
     return res
 
 if __name__ == '__main__':
-    fastf1.Cache.enable_cache('cache', force_renew=True)
 
-    res = get_live_timing()
-    print(res['drivers'])
-    print(*res['results'], sep='\n')
+    t = threading.Thread(target=wss.connect_wss, daemon=True)
+    t.start()
+
+    fastf1.Cache.enable_cache('cache')
+
+    while True:
+        print("Getting live timing data...")
+        try:
+            print(wss.data_global.get('TimingData'))
+        except:
+            pass
+        time.sleep(3)
+
+    # res = get_live_timing()
+    # print(res['drivers'])
+    # print(*res['results'], sep='\n')
