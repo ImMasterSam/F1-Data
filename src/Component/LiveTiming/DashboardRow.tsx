@@ -17,9 +17,10 @@ function DashboardRow({ result }: Props) {
     return <div className="dash-driver-row" key={result.driver.driverNumber}>
         <h3>{result.position}</h3>
         <h3 style={{color: `#${result.driver.driverTeamColor}`, fontFamily: 'F1'}}>{result.driver.driverAbbreviation}</h3>
-        <h3>{result.driverStatus}</h3>
-        <h3>{formatLaptime(result.lapTimeInfo.current)}</h3>
-        <h3>{formatLaptime(result.lapTimeInfo.fastest)}</h3>
+        <h3>{result.tire.compound}</h3>
+        <h3>L{result.tire.laps}</h3>
+        <h3>{result.Gap.toLeader}</h3>
+        <h3>{result.lapTimeInfo}</h3>
     </div>
 }
 

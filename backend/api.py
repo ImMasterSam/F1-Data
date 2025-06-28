@@ -1,8 +1,10 @@
+import wss
 from data import *
 from liveTiming import get_live_timing
 
 import json
 import time
+import threading
 
 import fastf1
 
@@ -53,5 +55,8 @@ def stream_live():
 if __name__ == '__main__':
     fastf1.set_log_level('ERROR')
     fastf1.Cache.enable_cache('cache')
+
+    t = threading.Thread(target=wss.connect_wss, daemon=True)
+    t.start()
 
     app.run(debug=True, host='')

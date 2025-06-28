@@ -1,8 +1,3 @@
-export type timeInfo_type = {
-  current: number | null;
-  fastest: number | null;
-}
-
 export type driver_type = {
   driverNumber: number;
   driverFullName: string;
@@ -10,16 +5,26 @@ export type driver_type = {
   driverTeamColor: string;
 }
 
+export type tireInfo_type = {
+  compound: string;
+  laps: number;
+}
+
+export type gapInfo_type = {
+  toLeader: string;
+  toFront: number;
+}
+
 export type result_type = {
   driver: driver_type;
-  driverStatus: string;
   position: number;
-  lapTimeInfo: timeInfo_type;
+  tire: tireInfo_type;
+  Gap: gapInfo_type;
+  lapTimeInfo: string | null;
 }
 
 export type dashData_type = {
   grandPrixName: string;
   session: string;
-  drivers: number[];
   results: result_type[];
 }

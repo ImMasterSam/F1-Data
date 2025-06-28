@@ -21,7 +21,9 @@ function LiveTimingPage() {
 
     eventSource.onmessage = (mes) => {
       //console.log(JSON.parse(mes.data).results[0]);
-      setData(JSON.parse(mes.data))
+      const content = JSON.parse(mes.data)
+      console.log(content);
+      setData(content)
     }
 
     eventSource.onopen = () => {
