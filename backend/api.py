@@ -65,4 +65,4 @@ if __name__ == '__main__':
     t = threading.Thread(target=wss.connect_wss, daemon=True)
     t.start()
 
-    app.run(debug=True, host='')
+    app.run(debug=True, host='0.0.0.0')
