@@ -2,6 +2,7 @@ import wss
 from data import *
 from liveTiming import get_live_timing
 
+import os
 import json
 import time
 import threading
@@ -53,6 +54,11 @@ def stream_live():
     return Response(iter_data(), content_type='text/event-stream')
 
 if __name__ == '__main__':
+
+    # 檢查並建立 cache 資料夾
+    if not os.path.exists('cache'):
+        os.makedirs('cache')
+
     fastf1.set_log_level('ERROR')
     fastf1.Cache.enable_cache('cache')
 

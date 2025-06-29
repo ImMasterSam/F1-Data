@@ -15,12 +15,14 @@ dist-ssr
 # Editor directories and files
 .vscode/*
 **/__pycache__/
+**/venv/
 **/cache/
 test.*
 !.vscode/extensions.json
 .idea
 .DS_Store
 *.txt
+!requirements.txt
 *.suo
 *.ntvs*
 *.njsproj
