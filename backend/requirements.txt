@@ -37,7 +37,6 @@ typing_extensions==4.14.0
 tzdata==2025.2
 url-normalize==2.2.1
 urllib3==2.5.0
-websocket==0.2.1
 websocket-client==1.8.0
 websockets==13.1
 Werkzeug==3.1.3
