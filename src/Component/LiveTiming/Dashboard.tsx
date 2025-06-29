@@ -9,9 +9,9 @@ type Props = {
 function Dashboard({ data, connectStatus }: Props) {
   return <>
     <h2>{data?.grandPrixName} - {data?.session}</h2>
-    {data?.results && data?.results.map((result) => {
+    {data?.results ? data?.results.map((result) => {
       return <DashboardRow result={result} key={result.driver.driverNumber}/>
-    })}
+    }) : <p>Loading Data ...</p>}
     <p>Connect Status: {connectStatus ? 'Connected' : 'Connecting ...'}</p>
   </>
 }

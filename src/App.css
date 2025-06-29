@@ -71,3 +71,9 @@ h2 {
     font-weight: normal;
     font-style: normal;
 }
+@font-face {
+    font-family: 'pixel';
+    src: url('/Fonts/VCR_OSD_MONO_1.001.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}

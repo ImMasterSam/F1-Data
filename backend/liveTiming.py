@@ -6,7 +6,6 @@ import pandas as pd
 import datetime
 import threading
 import time
-import asyncio
 
 import wss
 
@@ -41,7 +40,7 @@ def get_driver_info(driver_number: str, drivers_raw_data: dict) -> dict:
 
     driver_data = { 'driverNumber': int(driver_raw_data.get('RacingNumber', driver_number)),
                     'driverFullName': driver_raw_data.get('FullName', 'Unknown'),
-                    'driverAbbreviation': driver_raw_data.get('Tla', '???'),
+                    'driverAbbreviation': driver_raw_data.get('Tla', '???'), 
                     'driverTeamColor': driver_raw_data.get('TeamColour', 'FFFFFF'),}
 
     return driver_data
@@ -57,17 +56,48 @@ def get_current_tire_info(driver_number: str, tire_raw_data: dict) -> dict:
     
     return tire_info
 
-def get_gap_info(driver_number: str, timing_raw_data: dict) -> dict:
+def get_gap_info(driver_number: str, timing_raw_data: dict, session: str) -> dict:
     """Get the current gap info for a driver to the leader and the driver in front"""
 
     driver_timing_info = timing_raw_data.get('Lines', {}).get(driver_number, {})
-    driver_stats = driver_timing_info.get('Stats', {})[-1]
 
-    gap_info = { 'toLeader': driver_stats.get('TimeDiffToFastest', '-- ---'),
-                 'toFront': driver_stats.get('TimeDifftoPositionAhead', '-- ---')}
+    if session == 'Race':
+        gap_info = { 'toLeader': driver_timing_info.get('GapToLeader', '-- ---'),
+                     'toFront': driver_timing_info.get('IntervalToPositionAhead', {'Value': '-- ---'}).get('Value', '-- ---')}
+    else:
+        # In qualifying, the gap info is in the stats
+        driver_stats = driver_timing_info.get('Stats', {})[-1]
+
+        gap_info = { 'toLeader': driver_stats.get('TimeDiffToFastest', '-- ---'),
+                     'toFront': driver_stats.get('TimeDifftoPositionAhead', '-- ---')}
     
     return gap_info
 
+def get_lap_info(driver_number: str, stats_raw_data: dict, timing_raw_data: dict) -> dict:
+    """Get the lap time info for a driver"""
+
+    driver_stats_info = stats_raw_data.get('Lines', {}).get(driver_number, {})
+    driver_timing_info = timing_raw_data.get('Lines', {}).get(driver_number, {})
+
+    lap_info = { 'lastLap': driver_timing_info.get('LastLapTime', {'Value': ''}).get('Value'),
+                 'bestLap': driver_stats_info.get('PersonalBestLapTime', {'Value': ''}).get('Value')}
+
+    return lap_info
+
+def get_sector_info(driver_number: str, stats_raw_data: dict, timing_raw_data: dict) -> list:
+    """Get the sector info for a driver"""
+    
+    driver_stats_info = stats_raw_data.get('Lines', {}).get(driver_number, {})
+    driver_timing_info = timing_raw_data.get('Lines', {}).get(driver_number, {})
+
+    sectors = []
+
+    for i in range(3):
+        sector_last = driver_timing_info.get(f'Sectors')[i].get('Value')
+        sector_best = driver_stats_info.get(f'BestSectors')[i].get('Value')
+        sectors.append({'sectorLast': sector_last, 'sectorBest': sector_best})
+    
+    return sectors
 
 
 def get_live_timing():
@@ -79,18 +109,20 @@ def get_live_timing():
 
     res = dict()
     res['grandPrixName'] = session.event['EventName']
+    res['session'] = session.name
 
     result_list = []
     
     try:
         drivers_raw_data: dict = wss.data_global.get('DriverList')
         timing_raw_data: dict = wss.data_global.get('TimingData')
+        stats_raw_data: dict = wss.data_global.get('TimingStats')
         tire_raw_data: dict = wss.data_global.get('TimingAppData')
     except:
         print("No live data available yet")
         return res
     
-    res['session'] = session.name + (f' Q{timing_raw_data.get('SessionPart')}' if session.name == 'Qualifying' else '')
+    res['session'] += (f' Q{timing_raw_data.get('SessionPart')}' if session.name == 'Qualifying' else '')
 
     # Get evey driver's current result
     for (driverNumber, data) in timing_raw_data.get('Lines').items():
@@ -98,8 +130,9 @@ def get_live_timing():
         driver_result = { 'driver': get_driver_info(driverNumber, drivers_raw_data),
                           'position': int(data.get('Position', 9999)),
                           'tire': get_current_tire_info(driverNumber, tire_raw_data),
-                          'Gap': get_gap_info(driverNumber, timing_raw_data),
-                          'lapTimeInfo': data.get('BestLapTimes')[-1].get('Value', '-- -- ---')}
+                          'Gap': get_gap_info(driverNumber, timing_raw_data, stats_raw_data.get('SessionType')),
+                          'lapTime': get_lap_info(driverNumber, stats_raw_data, timing_raw_data),
+                          'sectors': get_sector_info(driverNumber, stats_raw_data, timing_raw_data)}
         
         result_list.append(driver_result)
 
@@ -118,9 +151,9 @@ if __name__ == '__main__':
     while True:
         print("Getting live timing data...")
         try:
-            res = get_live_timing()
-            print(*res['results'], sep='\n')
-            # print(wss.data_global.get('TimingAppData'))
+            # res = get_live_timing()
+            # print(*res['results'], sep='\n')
+            print(wss.data_global.get('TimingStats'))
         except:
             pass
         time.sleep(3)

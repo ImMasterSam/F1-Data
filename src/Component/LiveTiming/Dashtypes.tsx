@@ -15,12 +15,23 @@ export type gapInfo_type = {
   toFront: number;
 }
 
+export type lapInfo_type = {
+  lastLap: string;
+  bestLap: string;
+}
+
+export type sectorInfo_type = {
+  sectorLast: string;
+  sectorBest: string;
+}
+
 export type result_type = {
   driver: driver_type;
   position: number;
   tire: tireInfo_type;
   Gap: gapInfo_type;
-  lapTimeInfo: string | null;
+  lapTime: lapInfo_type;
+  sectors: sectorInfo_type[];
 }
 
 export type dashData_type = {

@@ -19,8 +19,12 @@ function DashboardRow({ result }: Props) {
         <h3 style={{color: `#${result.driver.driverTeamColor}`, fontFamily: 'F1'}}>{result.driver.driverAbbreviation}</h3>
         <h3>{result.tire.compound}</h3>
         <h3>L{result.tire.laps}</h3>
+        <h3>{result.Gap.toFront}</h3>
         <h3>{result.Gap.toLeader}</h3>
-        <h3>{result.lapTimeInfo}</h3>
+        <h3>{result.lapTime.lastLap}</h3>
+        <h3>{result.lapTime.bestLap}</h3>
+        <h3>{result.sectors[0].sectorLast}</h3>
+        <h3>{result.sectors[0].sectorBest}</h3>
     </div>
 }
 

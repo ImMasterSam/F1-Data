@@ -61,7 +61,7 @@ function LiveTimingPage() {
   }, [])
 
   return <div className="live-timing">
-    {isConnected ? <Dashboard data={data} connectStatus={isConnected} /> : <h2>Loading ...</h2>}
+    {isConnected ? <Dashboard data={data} connectStatus={isConnected} /> : <h2>Connecting ...</h2>}
   </div>
 }
 
