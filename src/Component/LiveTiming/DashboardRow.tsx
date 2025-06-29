@@ -5,13 +5,13 @@ type Props = {
     result: result_type
 }
 
-function formatLaptime(laptime: number | null) {
-    if (laptime === null) return "--:--.---";
-    const minutes = Math.floor(laptime / 60);
-    const seconds = Math.floor(laptime % 60);
-    const milliseconds = Math.round((laptime - Math.floor(laptime)) * 1000);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
-}
+// function formatLaptime(laptime: number | null) {
+//     if (laptime === null) return "--:--.---";
+//     const minutes = Math.floor(laptime / 60);
+//     const seconds = Math.floor(laptime % 60);
+//     const milliseconds = Math.round((laptime - Math.floor(laptime)) * 1000);
+//     return `${minutes}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
+// }
 
 function DashboardRow({ result }: Props) {
     return <div className="dash-driver-row" key={result.driver.driverNumber}>
