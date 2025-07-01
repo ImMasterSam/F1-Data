@@ -82,8 +82,18 @@ def get_gap_info(driver_timing_info: dict, session: str) -> dict:
 def get_lap_info(driver_stats_info: dict, driver_timing_info: dict) -> dict:
     """Get the lap time info for a driver"""
 
-    lap_info = { 'lastLap': driver_timing_info.get('LastLapTime', {'Value': ''}).get('Value'),
-                 'bestLap': driver_stats_info.get('PersonalBestLapTime', {'Value': ''}).get('Value')}
+    lastLap_info = driver_timing_info.get('LastLapTime', {'Value': ''})
+    lastLap = { 'lapTime': lastLap_info.get('Value', '-- ---'),
+                'overallFastest': lastLap_info.get('OverallFastest', False),
+                'personalFastest': lastLap_info.get('PersonalFastest', False)}
+    
+    bestLap_info = driver_stats_info.get('PersonalBestLapTime', {'Value': ''})
+    bestLap = { 'lapTime': bestLap_info.get('Value', '-- ---'),
+                'overallFastest': bestLap_info.get('Position', 0) == 1,
+                'personalFastest': bestLap_info.get('PersonalFastest', False)}
+
+    lap_info = { 'lastLap': lastLap,
+                 'bestLap': bestLap}
 
     return lap_info
 

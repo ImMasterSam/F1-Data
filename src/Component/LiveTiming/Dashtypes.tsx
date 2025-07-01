@@ -20,9 +20,15 @@ export type gapInfo_type = {
   toFront: number;
 }
 
+export type lapStatus_type = {
+  lapTime: string;
+  overallFastest: boolean;
+  personalFastest: boolean;
+}
+
 export type lapInfo_type = {
-  lastLap: string;
-  bestLap: string;
+  lastLap: lapStatus_type;
+  bestLap: lapStatus_type;
 }
 
 export type sectorInfo_type = {
