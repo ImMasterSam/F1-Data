@@ -15,7 +15,7 @@ function LiveTimingPage() {
       eventSourceRef.current.close()
     }
 
-    const url = 'http://40.115.217.122:5000/stream/live'
+    const url = 'http://127.0.0.1:5000/stream/live'
     let eventSource = new EventSource(url)
     eventSourceRef.current = eventSource
 

@@ -45,6 +45,14 @@ def get_driver_info(driver_number: str, drivers_raw_data: dict) -> dict:
 
     return driver_data
 
+def get_driver_status(driver_timing_info: dict) -> str:
+    """Get the current status of a driver"""
+
+    status = {'retired': driver_timing_info.get('Retired', True),
+              'stopped': driver_timing_info.get('Stopped', True),}
+    
+    return status
+
 def get_current_tire_info(driver_number: str, tire_raw_data: dict) -> dict:
     """Get the current tire info for a driver"""
 
@@ -56,10 +64,8 @@ def get_current_tire_info(driver_number: str, tire_raw_data: dict) -> dict:
     
     return tire_info
 
-def get_gap_info(driver_number: str, timing_raw_data: dict, session: str) -> dict:
+def get_gap_info(driver_timing_info: dict, session: str) -> dict:
     """Get the current gap info for a driver to the leader and the driver in front"""
-
-    driver_timing_info = timing_raw_data.get('Lines', {}).get(driver_number, {})
 
     if session == 'Race':
         gap_info = { 'toLeader': driver_timing_info.get('GapToLeader', '-- ---'),
@@ -73,29 +79,28 @@ def get_gap_info(driver_number: str, timing_raw_data: dict, session: str) -> dic
     
     return gap_info
 
-def get_lap_info(driver_number: str, stats_raw_data: dict, timing_raw_data: dict) -> dict:
+def get_lap_info(driver_stats_info: dict, driver_timing_info: dict) -> dict:
     """Get the lap time info for a driver"""
-
-    driver_stats_info = stats_raw_data.get('Lines', {}).get(driver_number, {})
-    driver_timing_info = timing_raw_data.get('Lines', {}).get(driver_number, {})
 
     lap_info = { 'lastLap': driver_timing_info.get('LastLapTime', {'Value': ''}).get('Value'),
                  'bestLap': driver_stats_info.get('PersonalBestLapTime', {'Value': ''}).get('Value')}
 
     return lap_info
 
-def get_sector_info(driver_number: str, stats_raw_data: dict, timing_raw_data: dict) -> list:
+def get_sector_info(driver_stats_info: dict, driver_timing_info: dict) -> list:
     """Get the sector info for a driver"""
-    
-    driver_stats_info = stats_raw_data.get('Lines', {}).get(driver_number, {})
-    driver_timing_info = timing_raw_data.get('Lines', {}).get(driver_number, {})
 
     sectors = []
 
     for i in range(3):
-        sector_last = driver_timing_info.get(f'Sectors')[i].get('Value')
-        sector_best = driver_stats_info.get(f'BestSectors')[i].get('Value')
-        sectors.append({'sectorLast': sector_last, 'sectorBest': sector_best})
+        sector_last = driver_timing_info.get(f'Sectors')[i]
+        sector_best = driver_stats_info.get(f'BestSectors')[i]
+
+        sector_data = { 'sectorLast': sector_last.get('Value'),
+                        'sectorBest': sector_best.get('Value'),
+                        'segments': [segment.get('Status') for segment in sector_last.get('Segments', [])]}
+
+        sectors.append(sector_data)
     
     return sectors
 
@@ -127,12 +132,16 @@ def get_live_timing():
     # Get evey driver's current result
     for (driverNumber, data) in timing_raw_data.get('Lines').items():
 
+        driver_timing_info = timing_raw_data.get('Lines', {}).get(driverNumber, {})
+        driver_stats_info = stats_raw_data.get('Lines', {}).get(driverNumber, {})
+
         driver_result = { 'driver': get_driver_info(driverNumber, drivers_raw_data),
                           'position': int(data.get('Position', 9999)),
+                          'status': get_driver_status(driver_timing_info),
                           'tire': get_current_tire_info(driverNumber, tire_raw_data),
-                          'Gap': get_gap_info(driverNumber, timing_raw_data, stats_raw_data.get('SessionType')),
-                          'lapTime': get_lap_info(driverNumber, stats_raw_data, timing_raw_data),
-                          'sectors': get_sector_info(driverNumber, stats_raw_data, timing_raw_data)}
+                          'Gap': get_gap_info(driver_timing_info, stats_raw_data.get('SessionType')),
+                          'lapTime': get_lap_info(driver_stats_info, driver_timing_info),
+                          'sectors': get_sector_info(driver_stats_info, driver_timing_info)}
         
         result_list.append(driver_result)
 

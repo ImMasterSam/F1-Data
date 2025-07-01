@@ -5,6 +5,11 @@ export type driver_type = {
   driverTeamColor: string;
 }
 
+export type statusInfo_type = {
+  retired: boolean;
+  stopped: boolean;
+}
+
 export type tireInfo_type = {
   compound: string;
   laps: number;
@@ -23,11 +28,13 @@ export type lapInfo_type = {
 export type sectorInfo_type = {
   sectorLast: string;
   sectorBest: string;
+  segments: number[];
 }
 
 export type result_type = {
   driver: driver_type;
   position: number;
+  status: statusInfo_type;
   tire: tireInfo_type;
   Gap: gapInfo_type;
   lapTime: lapInfo_type;
