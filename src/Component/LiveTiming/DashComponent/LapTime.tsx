@@ -13,8 +13,8 @@ const lastLap_color = (lastLap: lapStatus_type) => {
     return '#ffffff'
 }
 
-const bestLap_color = (lastLap: lapStatus_type) => {
-  if (lastLap.overallFastest)
+const bestLap_color = (bestLap: lapStatus_type) => {
+  if (bestLap.overallFastest)
     return '#7a22fe'
   else
     return '#ffffff'

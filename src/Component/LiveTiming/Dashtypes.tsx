@@ -31,9 +31,15 @@ export type lapInfo_type = {
   bestLap: lapStatus_type;
 }
 
+export type sectorStatus_type = {
+  sectorTime: string;
+  overallFastest: boolean;
+  personalFastest: boolean;
+}
+
 export type sectorInfo_type = {
-  sectorLast: string;
-  sectorBest: string;
+  sectorLast: sectorStatus_type;
+  sectorBest: sectorStatus_type;
   segments: number[];
 }
 

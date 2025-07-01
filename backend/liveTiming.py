@@ -103,12 +103,20 @@ def get_sector_info(driver_stats_info: dict, driver_timing_info: dict) -> list:
     sectors = []
 
     for i in range(3):
-        sector_last = driver_timing_info.get(f'Sectors')[i]
-        sector_best = driver_stats_info.get(f'BestSectors')[i]
+        sector_last_info = driver_timing_info.get(f'Sectors')[i]
+        sector_best_info = driver_stats_info.get(f'BestSectors')[i]
 
-        sector_data = { 'sectorLast': sector_last.get('Value'),
-                        'sectorBest': sector_best.get('Value'),
-                        'segments': [segment.get('Status') for segment in sector_last.get('Segments', [])]}
+        sector_last = { 'sectorTime': sector_last_info.get('Value', '-- ---'),
+                        'overallFastest': sector_last_info.get('OverallFastest', False),
+                        'personalFastest': sector_last_info.get('PersonalFastest', False)}
+        
+        sector_best = { 'sectorTime': sector_best_info.get('Value', '-- ---'),
+                        'overallFastest': sector_best_info.get('Position', 0) == 1,
+                        'personalFastest': sector_best_info.get('PersonalFastest', False)}
+
+        sector_data = { 'sectorLast': sector_last,
+                        'sectorBest': sector_best,
+                        'segments': [segment.get('Status') for segment in sector_last_info.get('Segments', [])]}
 
         sectors.append(sector_data)
     
