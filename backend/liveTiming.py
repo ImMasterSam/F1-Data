@@ -122,6 +122,19 @@ def get_sector_info(driver_stats_info: dict, driver_timing_info: dict) -> list:
     
     return sectors
 
+def get_weather_info(weather_raw_data: dict) -> dict:
+    """Get the current weather info"""
+
+    weather_info = { 'airTemp': float(weather_raw_data.get('AirTemp', '0')),
+                     'humidity': float(weather_raw_data.get('Humidity', '0')),
+                     'pressure': float(weather_raw_data.get('Pressure', '0')),
+                     'rainfall': weather_raw_data.get('Rainfall', '0') == '1',
+                     'trackTemp': float(weather_raw_data.get('TrackTemp', '0')),
+                     'windDirection': int(weather_raw_data.get('WindDirection', '0')),
+                     'windSpeed': float(weather_raw_data.get('WindSpeed', '0'))}
+
+    return weather_info
+
 
 def get_live_timing():
 
@@ -132,6 +145,7 @@ def get_live_timing():
 
     res = dict()
     res['grandPrixName'] = session.event['EventName']
+    res['country'] = session.event['Country']
     res['session'] = session.name
 
     result_list = []
@@ -141,6 +155,8 @@ def get_live_timing():
         timing_raw_data: dict = wss.data_global.get('TimingData')
         stats_raw_data: dict = wss.data_global.get('TimingStats')
         tire_raw_data: dict = wss.data_global.get('TimingAppData')
+        weather_raw_data: dict = wss.data_global.get('WeatherData')
+        trackStatus_raw_data: dict = wss.data_global.get('TrackStatus')
     except:
         print("No live data available yet")
         return res
@@ -165,6 +181,13 @@ def get_live_timing():
 
     result_list.sort(key=lambda x: x['position'])
     res['results'] = result_list
+
+    # Get the current track status
+    res['trackStatus'] = { 'status': int(trackStatus_raw_data.get('Status', '0')),
+                           'message': trackStatus_raw_data.get('Message', 'Unknown')}
+
+    # Get the current weather info
+    res['weather'] = get_weather_info(weather_raw_data)
     
     return res
 
@@ -180,7 +203,7 @@ if __name__ == '__main__':
         try:
             # res = get_live_timing()
             # print(*res['results'], sep='\n')
-            print(wss.data_global.get('TimingStats'))
+            print(wss.data_global.get('TrackStatus'))
         except:
             pass
         time.sleep(3)
