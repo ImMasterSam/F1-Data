@@ -1,10 +1,10 @@
 import type { result_type } from "./Dashtypes"
 import './Dashboard.css'
-import Position from "./DashComponent/Position"
-import Tire from "./DashComponent/Tire"
-import Gap from "./DashComponent/Gap"
-import LapTime from "./DashComponent/LapTime"
-import Sector from "./DashComponent/Sector/Sector"
+import Position from "./DashComponent/DashRowComponent/Position"
+import Tire from "./DashComponent/DashRowComponent/Tire"
+import Gap from "./DashComponent/DashRowComponent/Gap"
+import LapTime from "./DashComponent/DashRowComponent/LapTime"
+import Sector from "./DashComponent/DashRowComponent/Sector/Sector"
 
 type Props = {
     result: result_type

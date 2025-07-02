@@ -8,7 +8,7 @@ const tire_color: {[compound: string]: string} = {
   'SOFT': '#f12f32',
   'MEDIUM': '#fbcc1c',
   'HARD': '#ffffff',
-  'INTER': '#228439',
+  'INTERMEDIATE': '#228439',
   'WET': '#004cac'
 }
 

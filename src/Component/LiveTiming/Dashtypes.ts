@@ -53,8 +53,26 @@ export type result_type = {
   sectors: sectorInfo_type[];
 }
 
+export type weather_type = {
+  airTemp: number;
+  humidity: number;
+  pressure: number;
+  rainfall: boolean;
+  trackTemp: number;
+  windDirection: number;
+  windSpeed: number;
+}
+
+export type trackStatus_type = {
+  status: number; 
+  message: string; 
+}
+
 export type dashData_type = {
   grandPrixName: string;
   session: string;
+  country: string;
   results: result_type[];
+  weather: weather_type;
+  trackStatus: trackStatus_type;
 }

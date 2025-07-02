@@ -1,6 +1,45 @@
+.dashboard {
+    width: 50%;
+}
+
+.dash-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+
+.track-status {
+    border-radius: 5px;
+    width: auto;
+    align-items: center;
+    padding: 5px 10px;
+}
+
+.grandPrix-title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.weather-info {
+    width: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 5px 20px;
+    font-size: small;
+}
+
+.weather-info > p {
+    margin-left: 10px;
+}
+
 .dash-driver-row {
     width: 100%;
-    max-height: 4%;
+    min-height: fit-content;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -54,7 +93,7 @@
 
 .sector-feild {
     width: fit-content;
-    padding: 5px 1.5rem;
+    padding: 5px 0.5rem;
     text-align: Left;
     display: flex;
     flex-direction: column;

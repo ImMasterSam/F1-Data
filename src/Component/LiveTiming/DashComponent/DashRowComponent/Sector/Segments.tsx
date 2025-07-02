@@ -4,7 +4,7 @@ type Props = {
 
 const segment_color: {[status: number]: string} = {
      0: '#222222',
-  2050: '#7a22fe',
+  2051: '#7a22fe',
   2049: '#01a656',
   2048: '#ffb900',
   2064: '#2b7fff'
