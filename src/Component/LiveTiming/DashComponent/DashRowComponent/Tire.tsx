@@ -1,4 +1,4 @@
-import type { tireInfo_type } from "../Dashtypes";
+import type { tireInfo_type } from "../../Dashtypes";
 
 type Props = {
     tire: tireInfo_type;

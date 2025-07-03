@@ -1,4 +1,4 @@
-import type { driver_type } from "../Dashtypes"
+import type { driver_type } from "../../Dashtypes";
 
 type Props = {
     driver: driver_type;

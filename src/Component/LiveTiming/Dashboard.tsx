@@ -30,9 +30,11 @@ function Dashboard({ data, connectStatus }: dash_Props) {
   return <div className="dashboard">
     {data?.grandPrixName && <DashboardHeader data={data}/>}
     {data?.weather && <Weather weather={data?.weather}/>}
-    {data?.results ? data?.results.map((result) => {
-      return <DashboardRow result={result} key={result.driver.driverNumber}/>
-    }) : <p>Loading Data ...</p>}
+    <div className="drivers-table">
+      {data?.results ? data?.results.map((result) => {
+        return <DashboardRow result={result} key={result.driver.driverNumber}/>
+      }) : <p>Loading Data ...</p>}
+    </div>
     <p>Connect Status: {connectStatus ? 'Connected' : 'Connecting ...'}</p>
   </div>
 }

@@ -1,4 +1,5 @@
-import type { lapInfo_type, lapStatus_type } from "../Dashtypes";
+import type { lapInfo_type, lapStatus_type } from "../../Dashtypes";
+
 
 type Props = {
     lapTime: lapInfo_type;

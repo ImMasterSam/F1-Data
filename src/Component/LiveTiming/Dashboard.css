@@ -1,5 +1,10 @@
 .dashboard {
-    width: 50%;
+    width: fit-content;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 .dash-header {
@@ -7,7 +12,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding: 0 20px;
+    padding: 0 5px;
 }
 
 .track-status {
@@ -25,7 +30,7 @@
 }
 
 .weather-info {
-    width: auto;
+    min-width: fit-content;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -37,12 +42,21 @@
     margin-left: 10px;
 }
 
+.drivers-table {
+    width: 100%;
+    flex: 1 1 0;
+    display: grid;
+    grid-auto-rows: 1fr;
+    align-items: stretch;
+    overflow: auto;
+}
+
 .dash-driver-row {
     width: 100%;
-    min-height: fit-content;
     display: flex;
     flex-direction: row;
     align-items: center;
+    min-height: 0;
 }
 
 .out {
@@ -55,20 +69,26 @@
 }
 
 .position-feild {
-    width: 3.5rem;
-    padding: 5px 1.5rem;
+    width: 7rem;
+    padding: 0 15px;
     text-align: center;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 }
 
+.position-feild > h3 {
+    width: fit-content;
+    text-align: left;
+}
+
 .tire-feild {
-    width: 4rem;
-    padding: 5px 1.5rem;
+    min-width: 7rem;
+    padding: 0 15px;
     text-align: Left;
     display: flex;
     flex-direction: column;
+    text-overflow: ellipsis;
 }
 
 .tire-laps, .gap-toleader, .laptime-best, .sector-best {
@@ -76,16 +96,16 @@
 }
 
 .gap-feild {
-    width: 3rem;
-    padding: 5px 1.5rem;
+    width: 6rem;
+    padding: 0 15px;
     text-align: Left;
     display: flex;
     flex-direction: column;
 }
 
 .laptime-field {
-    width: 3rem;
-    padding: 5px 1.5rem;
+    width: 6rem;
+    padding: 0 15px;
     text-align: Left;
     display: flex;
     flex-direction: column;
@@ -93,7 +113,7 @@
 
 .sector-feild {
     width: fit-content;
-    padding: 5px 0.5rem;
+    padding-left: 10px;
     text-align: Left;
     display: flex;
     flex-direction: column;
