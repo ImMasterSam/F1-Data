@@ -9,7 +9,8 @@ const tire_color: {[compound: string]: string} = {
   'MEDIUM': '#fbcc1c',
   'HARD': '#ffffff',
   'INTERMEDIATE': '#228439',
-  'WET': '#004cac'
+  'WET': '#004cac',
+  'UNKNOWN': '#555555'
 }
 
 function Tire({ tire }: Props) {

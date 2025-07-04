@@ -236,6 +236,7 @@ export const Country: { [country: string]: string } = {
   "UnitedArabEmirates": "AE",
   "UAE": "AE",
   "UnitedKingdom": "GB",
+  "United Kingdom": "GB",
   "UK": "GB",
   "UnitedStates": "US",
   "USA": "US",

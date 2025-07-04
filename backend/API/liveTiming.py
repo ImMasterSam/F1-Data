@@ -20,8 +20,14 @@ def get_live_timing_data():
 
 def get_current_session(current_time: datetime.datetime) -> Session:
     """Get the current live session""" 
-    schedule = fastf1.get_event_schedule(current_time.year)
-    target_time = current_time + datetime.timedelta(minutes=5)  # Look for sessions starting within the last 15 minutes
+    try:
+        schedule = fastf1.get_event_schedule(current_time.year)
+    except:
+        try:
+            schedule = fastf1.get_event_schedule(2025)
+        except:
+            raise ValueError(f"Failed to load any schedule data. ({current_time})")
+    target_time = current_time + datetime.timedelta(minutes=5)  # Look for sessions starting within the last 5 minutes
 
     for round, event in schedule[::-1].iterrows():
         # print(event)
@@ -57,25 +63,32 @@ def get_current_tire_info(driver_number: str, tire_raw_data: dict) -> dict:
     """Get the current tire info for a driver"""
 
     driver_tire_info = tire_raw_data.get('Lines', {}).get(driver_number, {})
-    last_stint = driver_tire_info.get('Stints', {})[-1]
 
-    tire_info = { 'compound': last_stint.get('Compound', 'Unknown'),
-                  'laps': int(last_stint.get('TotalLaps', '999'))}
+    try:
+        last_stint = driver_tire_info.get('Stints', {})[-1]
+    except:
+        last_stint = {}
+
+    tire_info = { 'compound': last_stint.get('Compound', 'UNKNOWN'),
+                  'laps': int(last_stint.get('TotalLaps', '0'))}
     
     return tire_info
 
 def get_gap_info(driver_timing_info: dict, session: str) -> dict:
     """Get the current gap info for a driver to the leader and the driver in front"""
 
-    if session == 'Race':
-        gap_info = { 'toLeader': driver_timing_info.get('GapToLeader', '-- ---'),
-                     'toFront': driver_timing_info.get('IntervalToPositionAhead', {'Value': '-- ---'}).get('Value', '-- ---')}
-    else:
+    if session == 'Qualifying':
         # In qualifying, the gap info is in the stats
         driver_stats = driver_timing_info.get('Stats', {})[-1]
 
         gap_info = { 'toLeader': driver_stats.get('TimeDiffToFastest', '-- ---'),
                      'toFront': driver_stats.get('TimeDifftoPositionAhead', '-- ---')}
+    elif session == 'Race':
+        gap_info = { 'toLeader': driver_timing_info.get('GapToLeader', '-- ---'),
+                     'toFront': driver_timing_info.get('IntervalToPositionAhead', {'Value': '-- ---'}).get('Value', '-- ---')}
+    elif session.startswith('Practice'):
+        gap_info = { 'toLeader': driver_timing_info.get('TimeDiffToFastest', '-- ---'),
+                     'toFront': driver_timing_info.get('TimeDiffToPositionAhead', '-- ---')}
     
     return gap_info
 
@@ -106,11 +119,16 @@ def get_sector_info(driver_stats_info: dict, driver_timing_info: dict) -> list:
         sector_last_info = driver_timing_info.get(f'Sectors')[i]
         sector_best_info = driver_stats_info.get(f'BestSectors')[i]
 
-        sector_last = { 'sectorTime': sector_last_info.get('Value', '-- ---'),
+        sector_last_sectorTime = sector_last_info.get('Value', '-- ---')
+        sector_best_sectorTime = sector_best_info.get('Value', '-- ---')
+
+        sector_last = { 'sectorTime': sector_last_sectorTime if sector_last_sectorTime != '' else '-- ---',
+                        'previousSectorTime': sector_last_info.get('PreviousValue', '-- ---'),
                         'overallFastest': sector_last_info.get('OverallFastest', False),
                         'personalFastest': sector_last_info.get('PersonalFastest', False)}
         
-        sector_best = { 'sectorTime': sector_best_info.get('Value', '-- ---'),
+        sector_best = { 'sectorTime': sector_best_sectorTime if sector_best_sectorTime != '' else '-- ---',
+                        'previousSectorTime': sector_best_info.get('PreviousValue', '-- ---'),
                         'overallFastest': sector_best_info.get('Position', 0) == 1,
                         'personalFastest': sector_best_info.get('PersonalFastest', False)}
 
@@ -203,7 +221,7 @@ if __name__ == '__main__':
         try:
             # res = get_live_timing()
             # print(*res['results'], sep='\n')
-            print(wss.data_global.get('TrackStatus'))
+            print(wss.data_global.get('TimingData'))
         except:
             pass
         time.sleep(3)

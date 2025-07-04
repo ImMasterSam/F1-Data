@@ -22,7 +22,7 @@ function DashboardHeader({ data }: dashHeader_Props) {
             style={{scale: 2}} svg />
       <h2>{data.grandPrixName} - {data.session}</h2>
     </div>
-    <TrackStatus trackStatus={data.trackStatus}/>
+    {data?.trackStatus && <TrackStatus trackStatus={data.trackStatus}/>}
   </div>
 }
 

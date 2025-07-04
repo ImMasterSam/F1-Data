@@ -33,6 +33,7 @@ export type lapInfo_type = {
 
 export type sectorStatus_type = {
   sectorTime: string;
+  previousSectorTime: string;
   overallFastest: boolean;
   personalFastest: boolean;
 }

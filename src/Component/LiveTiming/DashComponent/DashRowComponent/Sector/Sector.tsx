@@ -25,7 +25,7 @@ function Sector({ sector }: Props) {
   return <div className="sector-feild">
     <Segment segments={sector.segments}/>
     <div className="sector-time">
-      <h4 style={{color: `${lastSector_color(sector.sectorLast)}`}}>{sector.sectorLast.sectorTime}</h4>
+      <h4 style={{color: `${lastSector_color(sector.sectorLast)}`}}>{sector.sectorLast.sectorTime != '-- ---' ? sector.sectorLast.sectorTime : sector.sectorLast.previousSectorTime}</h4>
       <p className={`laptime-best ${sector.sectorBest.overallFastest ? 'fastest' : ''}`} style={{color: `${bestSector_color(sector.sectorBest)}`}}>{sector.sectorBest.sectorTime}</p>
     </div>
   </div>
