@@ -51,12 +51,28 @@
     overflow: auto;
 }
 
+/* Scroll Bar */
+.drivers-table::-webkit-scrollbar {
+    width: 5px;
+    background: #222;
+}
+.drivers-table::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 2px;
+}
+.drivers-table::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
 .dash-driver-row {
     width: 100%;
     display: flex;
     flex-direction: row;
     align-items: center;
-    min-height: 0;
+}
+
+.dash-driver-row > * {
+    min-height: fit-content;
 }
 
 .out {

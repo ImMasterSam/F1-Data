@@ -4,6 +4,7 @@ import Weather from "./DashComponent/Weather";
 import type { dashData_type } from "./Dashtypes"
 import { Country } from "../Schedule/lib/CountryCode";
 import TrackStatus from "./DashComponent/TrackStatus";
+import CountDown from "./DashComponent/CountDown";
 
 type dash_Props = {
   data: dashData_type | null;
@@ -22,6 +23,7 @@ function DashboardHeader({ data }: dashHeader_Props) {
             style={{scale: 2}} svg />
       <h2>{data.grandPrixName} - {data.session}</h2>
     </div>
+    {data?.clock && <CountDown clock={data.clock}/>}
     {data?.trackStatus && <TrackStatus trackStatus={data.trackStatus}/>}
   </div>
 }

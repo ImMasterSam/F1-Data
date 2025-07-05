@@ -161,6 +161,19 @@ def get_weather_info(weather_raw_data: dict) -> dict:
 
     return weather_info
 
+def get_extrapolated_clock(clock_raw_data: dict) -> dict:
+
+    remaining_time = clock_raw_data.get('Remaining', '00:00:00')
+    h, m, s = map(int, remaining_time.split(':'))
+    remaining_seconds = h * 3600 + m * 60 + s
+
+    clock = {
+        'remaining': remaining_seconds,
+        'extrapolating': clock_raw_data.get('Extrapolating', False)
+    }
+
+    return clock
+
 
 def get_live_timing(wss_t: threading.Thread) -> dict:
 
@@ -190,6 +203,7 @@ def get_live_timing(wss_t: threading.Thread) -> dict:
         tire_raw_data: dict = wss.data_global.get('TimingAppData')
         weather_raw_data: dict = wss.data_global.get('WeatherData')
         trackStatus_raw_data: dict = wss.data_global.get('TrackStatus')
+        clock_raw_data: dict = wss.data_global.get('ExtrapolatedClock')
     except:
         print("No live data available yet")
         return res
@@ -221,6 +235,9 @@ def get_live_timing(wss_t: threading.Thread) -> dict:
 
     # Get the current weather info
     res['weather'] = get_weather_info(weather_raw_data)
+
+    # Get the extrapolated clock info
+    res['clock'] = get_extrapolated_clock(clock_raw_data)
     
     return res
 
@@ -236,7 +253,7 @@ if __name__ == '__main__':
         try:
             # res = get_live_timing()
             # print(*res['results'], sep='\n')
-            print(wss.data_global.get('TimingData'))
+            print(wss.data_global.get('RaceControlMessages'))
         except:
             pass
         time.sleep(3)

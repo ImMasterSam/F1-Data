@@ -69,11 +69,17 @@ export type trackStatus_type = {
   message: string; 
 }
 
+export type clock_type = {
+  remaining: number;
+  extrapolating: boolean;
+}
+
 export type dashData_type = {
   grandPrixName: string;
   session: string;
   country: string;
   results: result_type[];
   weather: weather_type;
+  clock: clock_type;
   trackStatus: trackStatus_type;
 }
