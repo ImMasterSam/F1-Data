@@ -1,6 +1,6 @@
 import Schedule from '../Component/Schedule/Schedule'
 import ScheduleHeader from '../Component/Schedule/ScheduleHeader'
-import './Page.css'
+import "../CSS/Page.css";
 
 function SchedulePage() {
   return <div className='schedule'>

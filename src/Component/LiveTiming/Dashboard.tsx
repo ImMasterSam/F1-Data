@@ -5,6 +5,7 @@ import type { dashData_type } from "./Dashtypes"
 import { Country } from "../Schedule/lib/CountryCode";
 import TrackStatus from "./DashComponent/TrackStatus";
 import CountDown from "./DashComponent/CountDown";
+import '../../CSS/Dashboard.css'
 
 type dash_Props = {
   data: dashData_type | null;

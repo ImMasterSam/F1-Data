@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import type { race_type } from "./lib/RaceTypes";
 import ScheduleBlock from "./ScheduleBlock";
-import './Schedule.css'
+import '../../CSS/Schedule.css'
 import { setRaceStatus } from "./lib/ScheduleHandler";
 
 const requestOption = {

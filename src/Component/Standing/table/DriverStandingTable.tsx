@@ -1,6 +1,6 @@
 import { team_theme } from "../Theme";
 import type { driverStanding_type } from "../StandingTypes";
-import './Table.css'
+import '../../../CSS/Table.css'
 
 type Props = {
   driverStanding: Array<driverStanding_type>

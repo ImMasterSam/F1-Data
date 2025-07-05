@@ -1,5 +1,5 @@
 import type { constructorStanding_type } from "../StandingTypes";
-import './Table.css'
+import '../../../CSS/Table.css'
 
 type Props = {
   constructorStanding: Array<constructorStanding_type>

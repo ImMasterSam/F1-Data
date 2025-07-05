@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import Dashboard from "../Component/LiveTiming/Dashboard"
 import type { dashData_type } from "../Component/LiveTiming/Dashtypes"
+import "../CSS/Page.css";
 
 function LiveTimingPage() {
 
@@ -37,11 +38,10 @@ function LiveTimingPage() {
     eventSource.onerror = (error) => {
       console.error('SSE error:', error);
       setIsConnected(false);
-      eventSource.close();
       if (!retryTimeoutRef.current) {
         retryTimeoutRef.current = setTimeout(() => {
           connectStream()
-        }, 1000)
+        }, 2000)
       }
     };
 
@@ -61,7 +61,7 @@ function LiveTimingPage() {
   }, [])
 
   return <div className="live-timing">
-    {isConnected ? <Dashboard data={data} connectStatus={isConnected} /> : <h2>Connecting ...</h2>}
+    {data ? <Dashboard data={data} connectStatus={isConnected} /> : <h2>Connecting to Server ...</h2>}
   </div>
 }
 

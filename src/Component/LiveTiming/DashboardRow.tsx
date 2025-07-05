@@ -1,5 +1,4 @@
 import type { result_type } from "./Dashtypes"
-import './Dashboard.css'
 import Position from "./DashComponent/DashRowComponent/Position"
 import Tire from "./DashComponent/DashRowComponent/Tire"
 import Gap from "./DashComponent/DashRowComponent/Gap"
