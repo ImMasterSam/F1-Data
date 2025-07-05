@@ -59,11 +59,13 @@ def get_driver_info(driver_number: str, drivers_raw_data: dict) -> dict:
 
     return driver_data
 
-def get_driver_status(driver_timing_info: dict) -> str:
+def get_driver_status(driver_timing_info: dict, entries: int = 999) -> str:
     """Get the current status of a driver"""
 
     status = {'retired': driver_timing_info.get('Retired', True),
-              'stopped': driver_timing_info.get('Stopped', True),}
+              'stopped': driver_timing_info.get('Stopped', True),
+              'knockedOut': driver_timing_info.get('KnockedOut', False),
+              'danger': int(driver_timing_info.get('Position', 99)) > entries,}
     
     return status
 
@@ -82,15 +84,17 @@ def get_current_tire_info(driver_number: str, tire_raw_data: dict) -> dict:
     
     return tire_info
 
-def get_gap_info(driver_timing_info: dict, session: str) -> dict:
+def get_gap_info(driver_timing_info: dict, session: str, session_part: str = '') -> dict:
     """Get the current gap info for a driver to the leader and the driver in front"""
 
     if session == 'Qualifying':
         # In qualifying, the gap info is in the stats
-        driver_stats = driver_timing_info.get('Stats', {})[-1]
+        driver_stats = driver_timing_info.get('Stats', {})[int(session_part) - 1]
 
         gap_info = { 'toLeader': driver_stats.get('TimeDiffToFastest', '-- ---'),
                      'toFront': driver_stats.get('TimeDifftoPositionAhead', '-- ---')}
+
+    # Else they are in the timing data    
     elif session == 'Race':
         gap_info = { 'toLeader': driver_timing_info.get('GapToLeader', '-- ---'),
                      'toFront': driver_timing_info.get('IntervalToPositionAhead', {'Value': '-- ---'}).get('Value', '-- ---')}
@@ -186,7 +190,7 @@ def get_live_timing(wss_t: threading.Thread) -> dict:
 
 
     # Load current session
-    session = current_session.get('session')
+    session: Session = current_session.get('session')
     session.load(laps=True, weather=False, telemetry=False)
 
     res = dict()
@@ -208,7 +212,12 @@ def get_live_timing(wss_t: threading.Thread) -> dict:
         print("No live data available yet")
         return res
     
-    res['session'] += (f' Q{timing_raw_data.get('SessionPart')}' if session.name == 'Qualifying' else '')
+    session_part = timing_raw_data.get('SessionPart', '')
+
+    if session.name == 'Qualifying':
+        entries = timing_raw_data.get('NoEntries', [])[int(session_part) % 3]
+    else:
+        entries = 999
 
     # Get evey driver's current result
     for (driverNumber, data) in timing_raw_data.get('Lines').items():
@@ -218,9 +227,9 @@ def get_live_timing(wss_t: threading.Thread) -> dict:
 
         driver_result = { 'driver': get_driver_info(driverNumber, drivers_raw_data),
                           'position': int(data.get('Position', 9999)),
-                          'status': get_driver_status(driver_timing_info),
+                          'status': get_driver_status(driver_timing_info, entries),
                           'tire': get_current_tire_info(driverNumber, tire_raw_data),
-                          'Gap': get_gap_info(driver_timing_info, stats_raw_data.get('SessionType')),
+                          'Gap': get_gap_info(driver_timing_info, stats_raw_data.get('SessionType'), session_part),
                           'lapTime': get_lap_info(driver_stats_info, driver_timing_info),
                           'sectors': get_sector_info(driver_stats_info, driver_timing_info)}
         

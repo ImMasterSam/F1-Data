@@ -153,8 +153,6 @@
     margin: 0 2px;
 }
 
-
-
 .tire-feild > p, .gap-feild > p, .laptime-field > p, .sector-time > p {
     font-size: 0.9rem;
 }
@@ -165,4 +163,8 @@
 
 .fastest {
     opacity: 1;
+}
+
+.danger {
+    background-color: #300;
 }

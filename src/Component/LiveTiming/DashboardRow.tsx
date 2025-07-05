@@ -10,8 +10,22 @@ type Props = {
     result: result_type
 }
 
+const isOut = (result: result_type) => {
+  if (result.status.retired || result.status.stopped || result.status.knockedOut)
+    return true
+  else
+    return false
+}
+
+const isDanger = (result: result_type) => {
+  if (result.status.danger)
+    return true
+  else
+    return false
+}
+
 function DashboardRow({ result }: Props) {
-  return <div className={`dash-driver-row ${result.status.retired || result.status.stopped ? 'out' : ''}`} key={result.driver.driverNumber}>
+  return <div className={`dash-driver-row ${isOut(result) ? 'out' : ''} ${isDanger(result) ? 'danger' : ''}`} key={result.driver.driverNumber}>
     <Position driver={result.driver} position={result.position}/>
     <Tire tire={result.tire}/>
     <Gap gap={result.Gap} leading={result.position == 1}/>

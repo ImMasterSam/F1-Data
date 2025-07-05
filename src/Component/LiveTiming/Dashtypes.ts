@@ -8,6 +8,8 @@ export type driver_type = {
 export type statusInfo_type = {
   retired: boolean;
   stopped: boolean;
+  danger: boolean;
+  knockedOut: boolean;
 }
 
 export type tireInfo_type = {
@@ -74,6 +76,10 @@ export type clock_type = {
   extrapolating: boolean;
 }
 
+export type quali_type = {
+  entries: number[];
+}
+
 export type dashData_type = {
   grandPrixName: string;
   session: string;
@@ -82,4 +88,5 @@ export type dashData_type = {
   weather: weather_type;
   clock: clock_type;
   trackStatus: trackStatus_type;
+  other?: quali_type;
 }
