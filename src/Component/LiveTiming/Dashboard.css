@@ -93,7 +93,7 @@
     justify-content: space-between;
 }
 
-.position-feild > h3 {
+.position-feild > * {
     width: fit-content;
     text-align: left;
 }
@@ -105,10 +105,6 @@
     display: flex;
     flex-direction: column;
     text-overflow: ellipsis;
-}
-
-.tire-laps, .gap-toleader, .laptime-best, .sector-best {
-    opacity: 0.7;
 }
 
 .gap-feild {
@@ -141,7 +137,7 @@
 }
 
 .sector-time > h4 {
-    padding: 0 5px;
+    margin: 0 5px;
 }
 
 .segment-row {
@@ -155,6 +151,16 @@
     height: 0.25rem;
     border-radius: 10%;
     margin: 0 2px;
+}
+
+
+
+.tire-feild > p, .gap-feild > p, .laptime-field > p, .sector-time > p {
+    font-size: 0.9rem;
+}
+
+.tire-laps, .gap-toleader, .laptime-best, .sector-best {
+    opacity: 0.7;
 }
 
 .fastest {
