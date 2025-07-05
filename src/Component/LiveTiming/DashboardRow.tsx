@@ -16,8 +16,8 @@ function DashboardRow({ result }: Props) {
     <Tire tire={result.tire}/>
     <Gap gap={result.Gap} leading={result.position == 1}/>
     <LapTime lapTime={result.lapTime}/>
-    {result.sectors.map((sector) => {
-      return <Sector sector={sector}/>
+    {result.sectors.map((sector, index) => {
+      return <Sector sector={sector} key={index}/>
     })}
   </div>
 }

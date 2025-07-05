@@ -12,8 +12,8 @@ const segment_color: {[status: number]: string} = {
 
 function Segment({ segments }: Props) {
   return <div className="segment-row">
-    {segments.map((status) => {
-        return <div className="segment" style={{backgroundColor: `${segment_color[status]}`}}></div>
+    {segments.map((status, index) => {
+        return <div className="segment" style={{backgroundColor: `${segment_color[status]}`}} key={index}></div>
     })}
   </div>
 }

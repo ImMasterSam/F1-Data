@@ -17,6 +17,8 @@ from gevent.pywsgi import WSGIServer
 app = Flask(__name__)
 CORS(app, origins=['http://localhost:5173', 'https://immastersam.github.io'])
 
+wss_t = threading.Thread(target=wss.connect_wss, daemon=True)
+
 @app.route('/stream')
 def stream():
 
@@ -45,10 +47,12 @@ def stream_time():
 @app.route('/stream/live')
 def stream_live():
 
+    global wss_t
+
     def iter_data():
 
         while True:
-            yield 'data:' + json.dumps(get_live_timing()) + '\n\n'
+            yield 'data:' + json.dumps(get_live_timing(wss_t)) + '\n\n'
             time.sleep(1)
 
     return Response(iter_data(), content_type='text/event-stream')
@@ -62,7 +66,6 @@ if __name__ == '__main__':
     fastf1.set_log_level('ERROR')
     fastf1.Cache.enable_cache('cache')
 
-    t = threading.Thread(target=wss.connect_wss, daemon=True)
-    t.start()
+    wss_t.start()
 
     app.run(debug=True, host='0.0.0.0')

@@ -9,17 +9,21 @@ import time
 
 import wss
 
-def get_live_timing_data():
-    '''Get live timing data from websocket connection'''
-    subscribe_msg = {
-        "H": "Streaming",
-        "M": "Subscribe",
-        "A": [["Heartbeat"]],
-        "I": 1
-    }
+current_session = {
+    'updateTime': datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(hours=5),
+    'session': None
+}
 
-def get_current_session(current_time: datetime.datetime) -> Session:
+def update_current_session() -> bool:
     """Get the current live session""" 
+
+    global current_session
+
+    # Check if the current session is still valid
+    current_time = datetime.datetime.now(tz=datetime.timezone.utc)
+    if current_time - current_session['updateTime'] < datetime.timedelta(minutes=5):
+        return False
+
     try:
         schedule = fastf1.get_event_schedule(current_time.year)
     except:
@@ -37,7 +41,11 @@ def get_current_session(current_time: datetime.datetime) -> Session:
             session_time = session_timestamp.to_pydatetime()
             session_time = session_time.astimezone(tz=datetime.timezone.utc) 
             if session_time <= target_time:
-                return fastf1.get_session(current_time.year, event['RoundNumber'], session)
+                current_session = {
+                    'updateTime': current_time,
+                    'session': fastf1.get_session(current_time.year, event['RoundNumber'], session)
+                } 
+                return True
             
 def get_driver_info(driver_number: str, drivers_raw_data: dict) -> dict:
     """Get the driver info for a given driver number"""
@@ -154,11 +162,18 @@ def get_weather_info(weather_raw_data: dict) -> dict:
     return weather_info
 
 
-def get_live_timing():
+def get_live_timing(wss_t: threading.Thread) -> dict:
+
+    global current_session
+
+    # update current session
+    if update_current_session():
+        wss_t.join()
+        wss_t.start()
+
 
     # Load current session
-    current_time = datetime.datetime.now(tz=datetime.timezone.utc)
-    session = get_current_session(current_time)
+    session = current_session.get('session')
     session.load(laps=True, weather=False, telemetry=False)
 
     res = dict()
