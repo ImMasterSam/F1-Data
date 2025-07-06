@@ -71,6 +71,10 @@
     align-items: center;
 }
 
+.dash-driver-row:hover {
+    background-color: #111;
+}
+
 .dash-driver-row > * {
     min-height: fit-content;
 }
@@ -82,6 +86,32 @@
 .dash-driver-row > h3{
     width: auto;
     padding: 10px 5px;
+}
+
+.drspit-feild {
+    width: 4rem;
+    margin: 5px 0;
+    padding: 5px 0;
+    border-radius: 0.5rem;
+    color: #444;
+    border: solid 2px;
+}
+
+.pit {
+    color: #2b7fff;
+}
+
+.ready {
+    color: #888;
+}
+
+.deploy {
+    color: #01a656;
+}
+
+.drspit-feild > h3 {
+    font-size: 0.8rem;
+    text-align: center;
 }
 
 .position-feild {
@@ -99,7 +129,7 @@
 }
 
 .tire-feild {
-    min-width: 7rem;
+    min-width: 6.5rem;
     padding: 0 15px;
     text-align: Left;
     display: flex;

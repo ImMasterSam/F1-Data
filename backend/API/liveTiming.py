@@ -2,6 +2,9 @@ import fastf1
 from fastf1.livetiming.data import LiveTimingData
 from fastf1.core import Session, Lap
 
+import base64
+import zlib
+import json
 import pandas as pd
 import datetime
 import threading
@@ -48,6 +51,18 @@ def update_current_session() -> bool:
                 current_session['session'].load(laps=False, weather=False, telemetry=False)
                 return True
             
+def decompressed_carData(raw_car_data: dict) -> dict:
+    """Decompress the car data from the raw data"""
+
+    if not raw_car_data:
+        return {}
+
+    compressed_bytes = base64.b64decode(raw_car_data)
+    decompressed_data = zlib.decompress(compressed_bytes, -zlib.MAX_WBITS)
+    car_data = json.loads(decompressed_data.decode('utf-8'))
+
+    return car_data.get('Entries', [0])[-1].get('Cars', {})
+            
 def get_driver_info(driver_number: str, drivers_raw_data: dict) -> dict:
     """Get the driver info for a given driver number"""
 
@@ -59,6 +74,36 @@ def get_driver_info(driver_number: str, drivers_raw_data: dict) -> dict:
                     'driverTeamColor': driver_raw_data.get('TeamColour', 'FFFFFF'),}
 
     return driver_data
+
+def get_drspit_info(driver_timing_info: dict, car_info: dict) -> dict:
+    """Get the DRS info for a driver"""
+
+    # DRS
+    DRS_ENABLED = {10, 12, 14}
+
+    drs_raw = car_info.get('Channels', {}).get('45', 0)
+    if drs_raw in DRS_ENABLED:
+        drs_status = 2  # DRS is enabled
+    elif drs_raw == 8:
+        drs_status = 1  # DRS is ready
+    else:
+        drs_status = 0
+
+    # PIT
+    inPit = driver_timing_info.get('InPit', False)
+    PitOut = driver_timing_info.get('PitOut', False)
+
+    if inPit:
+        pit_status = 1  # In pit
+    elif PitOut:
+        pit_status = 2  # Out of pit
+    else:
+        pit_status = 0
+
+    drspit_info = { 'drsStatus': drs_status,
+                 'pitStatus': pit_status}
+
+    return drspit_info
 
 def get_driver_status(driver_timing_info: dict, entries: int = 999) -> str:
     """Get the current status of a driver"""
@@ -207,6 +252,7 @@ def get_live_timing(wss_t: threading.Thread) -> dict:
         clock_raw_data: dict = wss.data_global.get('ExtrapolatedClock')
         session_raw_data: dict = wss.data_global.get('SessionInfo')
         lapCount_raw_data: dict = wss.data_global.get('LapCount')
+        car_raw_data: dict = wss.data_global.get('CarData.z')
     except:
         print("No live data available yet")
         return res
@@ -231,15 +277,20 @@ def get_live_timing(wss_t: threading.Thread) -> dict:
     if session_type == 'Race':
         res['other'] = { 'currentLap': int(lapCount_raw_data.get('CurrentLap', 0)),
                          'totalLaps': int(lapCount_raw_data.get('TotalLaps', 0))}
+        
+    # Get car data
+    car_data = decompressed_carData(car_raw_data)
 
     # Get evey driver's current result
     for (driverNumber, data) in timing_raw_data.get('Lines').items():
 
         driver_timing_info = timing_raw_data.get('Lines', {}).get(driverNumber, {})
         driver_stats_info = stats_raw_data.get('Lines', {}).get(driverNumber, {})
+        car_info = car_data.get(driverNumber, {}).get('Channels', {})
 
         driver_result = { 'driver': get_driver_info(driverNumber, drivers_raw_data),
                           'position': int(data.get('Position', 9999)),
+                          'drspit': get_drspit_info(driver_timing_info, car_info),
                           'status': get_driver_status(driver_timing_info, entries),
                           'tire': get_current_tire_info(driverNumber, tire_raw_data),
                           'Gap': get_gap_info(driver_timing_info, session_type, session_part),
@@ -275,9 +326,15 @@ if __name__ == '__main__':
         try:
             # res = get_live_timing()
             # print(*res['results'], sep='\n')
-            print(wss.data_global.get('LapCount'))
-        except:
-            pass
+            # print(wss.data_global.get('TimingData'))
+            raw_car_data = wss.data_global.get('CarData.z')
+            compressed_bytes = base64.b64decode(raw_car_data)
+            decompressed_data = zlib.decompress(compressed_bytes, -zlib.MAX_WBITS)
+            car_data = json.loads(decompressed_data.decode('utf-8'))
+            print(car_data)
+        except Exception as e:
+            print(f"Error getting live timing data: {e}")
+            
         time.sleep(3)
 
     

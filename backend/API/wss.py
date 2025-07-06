@@ -50,7 +50,7 @@ def connect_wss():
         subscribe_msg = {
             "H": "Streaming",
             "M": "Subscribe",
-            "A": [["Heartbeat", "DriverList", "TimingData", "TimingStats", "TimingAppData", "WeatherData", "TrackStatus", "ExtrapolatedClock", "RaceControlMessages", "LapCount", "SessionInfo"]],
+            "A": [["Heartbeat", "DriverList", "TimingData", "TimingStats", "TimingAppData", "CarData.z", "WeatherData", "TrackStatus", "ExtrapolatedClock", "RaceControlMessages", "LapCount", "SessionInfo"]],
             "I": 1
         }
         ws.send(json.dumps(subscribe_msg))
@@ -76,7 +76,7 @@ def connect_wss():
             subscribe_msg = {
                 "H": "Streaming",
                 "M": "Subscribe",
-                "A": [["TimingData", "TimingStats", "TimingAppData", "WeatherData", "TrackStatus", "ExtrapolatedClock", "RaceControlMessages", "LapCount", "SessionInfo"]],
+                "A": [["TimingData", "TimingStats", "TimingAppData", "CarData.z", "WeatherData", "TrackStatus", "ExtrapolatedClock", "RaceControlMessages", "LapCount", "SessionInfo"]],
                 "I": 1
             }
             ws.send(json.dumps(subscribe_msg))

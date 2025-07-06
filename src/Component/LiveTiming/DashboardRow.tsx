@@ -4,6 +4,7 @@ import Tire from "./DashComponent/DashRowComponent/Tire"
 import Gap from "./DashComponent/DashRowComponent/Gap"
 import LapTime from "./DashComponent/DashRowComponent/LapTime"
 import Sector from "./DashComponent/DashRowComponent/Sector/Sector"
+import DrsPit from "./DashComponent/DashRowComponent/DrsPit"
 
 type Props = {
     result: result_type
@@ -26,6 +27,7 @@ const isDanger = (result: result_type) => {
 function DashboardRow({ result }: Props) {
   return <div className={`dash-driver-row ${isOut(result) ? 'out' : ''} ${isDanger(result) ? 'danger' : ''}`} key={result.driver.driverNumber}>
     <Position driver={result.driver} position={result.position}/>
+    <DrsPit drspit={result.drspit}/>
     <Tire tire={result.tire}/>
     <Gap gap={result.Gap} leading={result.position == 1}/>
     <LapTime lapTime={result.lapTime}/>

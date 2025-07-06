@@ -5,6 +5,11 @@ export type driver_type = {
   driverTeamColor: string;
 }
 
+export type drspitInfo_type = {
+  drsStatus: number;
+  pitStatus: number;
+}
+
 export type statusInfo_type = {
   retired: boolean;
   stopped: boolean;
@@ -49,6 +54,7 @@ export type sectorInfo_type = {
 export type result_type = {
   driver: driver_type;
   position: number;
+  drspit: drspitInfo_type;
   status: statusInfo_type;
   tire: tireInfo_type;
   Gap: gapInfo_type;
