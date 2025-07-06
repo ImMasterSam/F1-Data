@@ -216,6 +216,7 @@ def get_live_timing(wss_t: threading.Thread) -> dict:
 
     if session.name == 'Qualifying':
         entries = timing_raw_data.get('NoEntries', [])[int(session_part) % 3]
+        res['session'] += f' Q{session_part}'
     else:
         entries = 999
 
