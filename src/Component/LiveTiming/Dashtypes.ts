@@ -80,6 +80,11 @@ export type quali_type = {
   entries: number[];
 }
 
+export type race_type = {
+  currentLap: number;
+  totalLaps: number;
+}
+
 export type dashData_type = {
   grandPrixName: string;
   session: string;
@@ -88,5 +93,5 @@ export type dashData_type = {
   weather: weather_type;
   clock: clock_type;
   trackStatus: trackStatus_type;
-  other?: quali_type;
+  other?: quali_type | race_type;
 }

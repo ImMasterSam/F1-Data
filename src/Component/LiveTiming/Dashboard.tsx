@@ -25,6 +25,9 @@ function DashboardHeader({ data }: dashHeader_Props) {
       <h2>{data.grandPrixName} - {data.session}</h2>
     </div>
     {data?.clock && <CountDown clock={data.clock}/>}
+    {data?.other && data.session == 'Race' && 'currentLap' in data.other && 'totalLaps' in data.other && (
+      <h3>{`Lap ${data.other.currentLap} / ${data.other.totalLaps}`}</h3>
+    )}
     {data?.trackStatus && <TrackStatus trackStatus={data.trackStatus}/>}
   </div>
 }
@@ -38,7 +41,7 @@ function Dashboard({ data, connectStatus }: dash_Props) {
         return <DashboardRow result={result} key={result.driver.driverNumber}/>
       }) : <p>Loading Data ...</p>}
     </div>
-    <p>Connect Status: {connectStatus ? 'Connected' : 'Connecting ...'}</p>
+    <p>Connect Status: {connectStatus ? 'Connected' : 'Connecting ... (If stuck please refresh the page)'}</p>
   </div>
 }
 

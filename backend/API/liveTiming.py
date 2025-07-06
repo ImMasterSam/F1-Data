@@ -31,7 +31,7 @@ def update_current_session() -> bool:
             schedule = fastf1.get_event_schedule(2025)
         except:
             raise ValueError(f"Failed to load any schedule data. ({current_time})")
-    target_time = current_time + datetime.timedelta(minutes=5)  # Look for sessions starting within the last 5 minutes
+    target_time = current_time + datetime.timedelta(minutes=15)  # Look for sessions starting within the last 5 minutes
 
     for round, event in schedule[::-1].iterrows():
         # print(event)
@@ -45,6 +45,7 @@ def update_current_session() -> bool:
                     'updateTime': current_time,
                     'session': fastf1.get_session(current_time.year, event['RoundNumber'], session)
                 } 
+                current_session['session'].load(laps=False, weather=False, telemetry=False)
                 return True
             
 def get_driver_info(driver_number: str, drivers_raw_data: dict) -> dict:
@@ -161,7 +162,7 @@ def get_weather_info(weather_raw_data: dict) -> dict:
                      'rainfall': weather_raw_data.get('Rainfall', '0') == '1',
                      'trackTemp': float(weather_raw_data.get('TrackTemp', '0')),
                      'windDirection': int(weather_raw_data.get('WindDirection', '0')),
-                     'windSpeed': float(weather_raw_data.get('WindSpeed', '0'))}
+                     'windSpeed': float(weather_raw_data.get('WindSpeed', '0')) * 3.6}
 
     return weather_info
 
@@ -190,13 +191,9 @@ def get_live_timing(wss_t: threading.Thread) -> dict:
 
 
     # Load current session
-    session: Session = current_session.get('session')
-    session.load(laps=True, weather=False, telemetry=False)
+    # session: Session = current_session.get('session')
 
     res = dict()
-    res['grandPrixName'] = session.event['EventName']
-    res['country'] = session.event['Country']
-    res['session'] = session.name
 
     result_list = []
     
@@ -208,17 +205,32 @@ def get_live_timing(wss_t: threading.Thread) -> dict:
         weather_raw_data: dict = wss.data_global.get('WeatherData')
         trackStatus_raw_data: dict = wss.data_global.get('TrackStatus')
         clock_raw_data: dict = wss.data_global.get('ExtrapolatedClock')
+        session_raw_data: dict = wss.data_global.get('SessionInfo')
+        lapCount_raw_data: dict = wss.data_global.get('LapCount')
     except:
         print("No live data available yet")
         return res
     
+    meeting_data = session_raw_data.get('Meeting', {})
+    
+    res['grandPrixName'] = meeting_data.get('Name', 'Unknown')
+    res['country'] = meeting_data.get('Country', {}).get('Name', 'Unknown')
+    
+    session_type = session_raw_data.get('Type', 'Unknown')
+    res['session'] = session_raw_data.get('Name', 'Unknown')
+    
+    # Qualifying handling
     session_part = timing_raw_data.get('SessionPart', '')
-
-    if session.name == 'Qualifying':
+    if session_type == 'Qualifying':
+        # In qualifying, entries marks the number of drivers that are allowed to qualify
         entries = timing_raw_data.get('NoEntries', [])[int(session_part) % 3]
-        res['session'] += f' Q{session_part}'
     else:
         entries = 999
+
+    # Race handling
+    if session_type == 'Race':
+        res['other'] = { 'currentLap': int(lapCount_raw_data.get('CurrentLap', 0)),
+                         'totalLaps': int(lapCount_raw_data.get('TotalLaps', 0))}
 
     # Get evey driver's current result
     for (driverNumber, data) in timing_raw_data.get('Lines').items():
@@ -230,7 +242,7 @@ def get_live_timing(wss_t: threading.Thread) -> dict:
                           'position': int(data.get('Position', 9999)),
                           'status': get_driver_status(driver_timing_info, entries),
                           'tire': get_current_tire_info(driverNumber, tire_raw_data),
-                          'Gap': get_gap_info(driver_timing_info, stats_raw_data.get('SessionType'), session_part),
+                          'Gap': get_gap_info(driver_timing_info, session_type, session_part),
                           'lapTime': get_lap_info(driver_stats_info, driver_timing_info),
                           'sectors': get_sector_info(driver_stats_info, driver_timing_info)}
         
@@ -263,7 +275,7 @@ if __name__ == '__main__':
         try:
             # res = get_live_timing()
             # print(*res['results'], sep='\n')
-            print(wss.data_global.get('RaceControlMessages'))
+            print(wss.data_global.get('LapCount'))
         except:
             pass
         time.sleep(3)

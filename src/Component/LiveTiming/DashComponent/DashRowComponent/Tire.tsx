@@ -13,9 +13,18 @@ const tire_color: {[compound: string]: string} = {
   'UNKNOWN': '#555555'
 }
 
+const tire_name = (compound: string) => {
+  switch (compound.toUpperCase()) {
+    case 'INTERMEDIATE':
+      return 'INTER'
+    default:
+      return compound.toUpperCase()
+  }
+}
+
 function Tire({ tire }: Props) {
   return <div className="tire-feild">
-    <h4 style={{color: tire_color[tire.compound]}}>{tire.compound}</h4>
+    <h4 style={{color: tire_color[tire.compound]}}>{tire_name(tire.compound)}</h4>
     <p className="tire-laps">Lap {tire.laps}</p>
   </div>
 }

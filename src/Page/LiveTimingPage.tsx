@@ -16,8 +16,8 @@ function LiveTimingPage() {
       eventSourceRef.current.close()
     }
 
-    // const url = 'http://127.0.0.1:5000/stream/live'
-    const url = 'https://f1data.duckdns.org/stream/live'
+    const url = 'http://127.0.0.1:5000/stream/live'
+    // const url = 'https://f1data.duckdns.org/stream/live'
     let eventSource = new EventSource(url)
     eventSourceRef.current = eventSource
 

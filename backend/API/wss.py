@@ -7,6 +7,7 @@ from time import sleep
 
 ws_global: websocket.WebSocketApp = None
 data_global = None
+driver_global = None
 
 def negotiate(hub):
 
@@ -49,26 +50,33 @@ def connect_wss():
         subscribe_msg = {
             "H": "Streaming",
             "M": "Subscribe",
-            "A": [["Heartbeat", "DriverList", "TimingData", "TimingStats", "TimingAppData", "WeatherData", "TrackStatus", "ExtrapolatedClock", "RaceControlMessages"]],
+            "A": [["Heartbeat", "DriverList", "TimingData", "TimingStats", "TimingAppData", "WeatherData", "TrackStatus", "ExtrapolatedClock", "RaceControlMessages", "LapCount", "SessionInfo"]],
             "I": 1
         }
         ws.send(json.dumps(subscribe_msg))
         
 
     def on_message(ws: websocket.WebSocketApp, message):
-        global data_global
+        global data_global, driver_global
 
         # print("received Message: ", message[:100], "...")  # Print first 100 characters for brevity
         msg_json = json.loads(message)
         if msg_json.get('R'):
-            # print("Load to global data")
+
             data_global = msg_json.get('R')
+            if data_global.get('DriverList'):
+                driver_global = data_global.get('DriverList')
+            else:
+                if driver_global is not None:
+                    data_global['DriverList'] = driver_global
+                else:
+                    raise Exception("DriverList not found in data_global and driver_global is None")
             # print("Data received:", data_global)
 
             subscribe_msg = {
                 "H": "Streaming",
                 "M": "Subscribe",
-                "A": [["DriverList", "TimingData", "TimingStats", "TimingAppData", "WeatherData", "TrackStatus", "ExtrapolatedClock", "RaceControlMessages"]],
+                "A": [["TimingData", "TimingStats", "TimingAppData", "WeatherData", "TrackStatus", "ExtrapolatedClock", "RaceControlMessages", "LapCount", "SessionInfo"]],
                 "I": 1
             }
             ws.send(json.dumps(subscribe_msg))
