@@ -5,19 +5,13 @@
 }
 
 body, html, #root {
+    width: 100%;
     height: 100vh;
     background-color: black;
     color: white;
     font-family: sans-serif;
     display: flex;
-    flex-direction: column;
-}
-
-h1 {
-    border-bottom: 1px solid gray;
-    text-align: left;
-    padding: 20px 10px;
-    align-items: left;
+    flex-direction: row;
 }
 
 h2 {
@@ -25,40 +19,29 @@ h2 {
     padding: 10px 20px;
 }
 
-.main-container {
+.root {
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: row;
 }
 
-.side-bar {
-    width: 220px;
+
+.main-container {
+    flex: 1 1 0;
+    width: 100%;
     height: 100%;
-    border-right: 1px solid gray;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    flex-shrink: 0;
 }
 
-.side-bar > a {
-    width: 80%;
-    padding: 10px;
-    margin-top: 10px;
-    text-decoration: none;
-    color: white;
-    text-align: center;
-    font-size: large;
-    border-radius: 5px;
-    transition: all 0.3s;
+.main-container > h1 {
+    border-bottom: 1px solid gray;
+    text-align: left;
+    padding: 15px 0;
+    padding-left: 15px;
+    align-items: left;
 }
-
-.side-bar > a:hover {
-    background-color: #464646;
-    scale: 1.05;
-}
-
 
 @font-face {
     font-family: 'F1';
