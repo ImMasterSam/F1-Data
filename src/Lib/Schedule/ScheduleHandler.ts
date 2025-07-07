@@ -1,4 +1,4 @@
-import type { race_type } from "./RaceTypes";
+import type { race_type } from "../../Type/RaceTypes";
 
 export const setRaceStatus = (scheduleList: race_type[]) => {
 

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import type { race_type } from "./lib/RaceTypes";
+import type { race_type } from "../../Type/RaceTypes";
 import ScheduleBlock from "./ScheduleBlock";
 import '../../CSS/Schedule.css'
-import { setRaceStatus } from "./lib/ScheduleHandler";
+import { setRaceStatus } from "../../Lib/Schedule/ScheduleHandler";
 
 const requestOption = {
     method: 'GET',

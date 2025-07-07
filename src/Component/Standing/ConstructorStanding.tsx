@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { constructorStanding_type } from './StandingTypes.tsx';
+import type { constructorStanding_type } from '../../Type/StandingTypes.tsx';
 import ConstructorStandingTable from './table/ConstructorStandingTable.tsx';
 
 const requestOption = {

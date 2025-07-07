@@ -1,8 +1,8 @@
 import ReactCountryFlag from "react-country-flag";
 import DashboardRow from "./DashboardRow";
 import Weather from "./DashComponent/Weather";
-import type { dashData_type } from "./Dashtypes"
-import { Country } from "../Schedule/lib/CountryCode";
+import type { dashData_type } from "../../Type/Dashtypes"
+import { Country } from "../../Lib/CountryCode";
 import TrackStatus from "./DashComponent/TrackStatus";
 import CountDown from "./DashComponent/CountDown";
 import '../../CSS/Dashboard.css'

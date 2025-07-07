@@ -1,4 +1,4 @@
-import type { constructorStanding_type } from "../StandingTypes";
+import type { constructorStanding_type } from "../../../Type/StandingTypes";
 import '../../../CSS/Table.css'
 
 type Props = {

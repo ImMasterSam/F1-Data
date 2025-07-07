@@ -1,7 +1,7 @@
 import ReactCountryFlag from "react-country-flag";
-import type { race_type } from "./lib/RaceTypes";
-import { Country } from "./lib/CountryCode";
-import { getDateRange } from "./lib/TimeHandler";
+import type { race_type } from "../../Type/RaceTypes";
+import { Country } from "../../Lib/CountryCode";
+import { getDateRange } from "../../Lib/Schedule/TimeHandler";
 
 type Props = {
     race: race_type;

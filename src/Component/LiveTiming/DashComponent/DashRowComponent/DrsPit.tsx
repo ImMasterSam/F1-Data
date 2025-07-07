@@ -1,4 +1,4 @@
-import type { drspitInfo_type } from "../../Dashtypes";
+import type { drspitInfo_type } from "../../../../Type/Dashtypes";
 
 type Props = {
     drspit: drspitInfo_type;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { getTimeString } from "./lib/TimeHandler"
+import { getTimeString } from "../../Lib/Schedule/TimeHandler"
 
 function ScheduleHeader() {
 

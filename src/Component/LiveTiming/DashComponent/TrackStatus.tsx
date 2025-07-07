@@ -1,4 +1,4 @@
-import type { trackStatus_type } from "../Dashtypes";
+import type { trackStatus_type } from "../../../Type/Dashtypes";
 
 type Props = {
     trackStatus: trackStatus_type;

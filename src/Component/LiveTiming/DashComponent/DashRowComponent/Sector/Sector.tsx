@@ -1,4 +1,4 @@
-import type { sectorInfo_type, sectorStatus_type } from "../../../Dashtypes";
+import type { sectorInfo_type, sectorStatus_type } from "../../../../../Type/Dashtypes";
 import Segment from "./Segments";
 
 type Props = {

@@ -1,5 +1,5 @@
-import { team_theme } from "../Theme";
-import type { driverStanding_type } from "../StandingTypes";
+import { team_theme } from "../../../Lib/TeamTheme";
+import type { driverStanding_type } from "../../../Type/StandingTypes";
 import '../../../CSS/Table.css'
 
 type Props = {

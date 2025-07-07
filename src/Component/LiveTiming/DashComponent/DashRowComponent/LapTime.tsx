@@ -1,4 +1,4 @@
-import type { lapInfo_type, lapStatus_type } from "../../Dashtypes";
+import type { lapInfo_type, lapStatus_type } from "../../../../Type/Dashtypes";
 
 
 type Props = {

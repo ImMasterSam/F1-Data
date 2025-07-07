@@ -1,4 +1,4 @@
-import type { gapInfo_type } from "../../Dashtypes";
+import type { gapInfo_type } from "../../../../Type/Dashtypes";
 
 
 type Props = {

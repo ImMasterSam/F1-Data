@@ -1,4 +1,4 @@
-import type { clock_type } from "../Dashtypes"
+import type { clock_type } from "../../../Type/Dashtypes"
 
 type Props = {
   clock: clock_type

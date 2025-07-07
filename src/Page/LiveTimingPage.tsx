@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import Dashboard from "../Component/LiveTiming/Dashboard"
-import type { dashData_type } from "../Component/LiveTiming/Dashtypes"
+import type { dashData_type } from "../Type/Dashtypes"
 import "../CSS/Page.css";
 
 function LiveTimingPage() {
