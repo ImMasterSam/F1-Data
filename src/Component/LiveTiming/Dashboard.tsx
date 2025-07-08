@@ -1,11 +1,10 @@
 import ReactCountryFlag from "react-country-flag";
-import DashboardRow from "./DashboardRow";
-import Weather from "./DashComponent/Weather";
+import DashboardRow from "./DashComponent/DashboardRow";
+import Weather from "./DashComponent/DashHeader/Weather";
 import type { dashData_type } from "../../Type/Dashtypes"
 import { Country } from "../../Lib/CountryCode";
-import TrackStatus from "./DashComponent/TrackStatus";
-import CountDown from "./DashComponent/CountDown";
-import '../../CSS/Dashboard.css'
+import TrackStatus from "./DashComponent/DashHeader/TrackStatus";
+import CountDown from "./DashComponent/DashHeader/CountDown";
 
 type dash_Props = {
   data: dashData_type | null;

@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from "react"
 import Dashboard from "../Component/LiveTiming/Dashboard"
 import type { dashData_type } from "../Type/Dashtypes"
+import Map from "../Component/LiveTiming/Map";
+import RaceControl from "../Component/LiveTiming/RaceControl";
+import Radio from "../Component/LiveTiming/Radio";
 import "../CSS/Page.css";
+import '../CSS/Dashboard.css'
+import '../CSS/DashInfo.css'
 
 function LiveTimingPage() {
 
@@ -62,7 +67,18 @@ function LiveTimingPage() {
   }, [])
 
   return <div className="live-timing">
-    {data ? <Dashboard data={data} connectStatus={isConnected} /> : <h2>Connecting to Server ...</h2>}
+    {data 
+    ? <div className="dash-container">
+      <Dashboard data={data} connectStatus={isConnected} />
+      <div className="dash-info">
+        <Map />
+        <div className='message-info'>
+          <RaceControl raceControlMessages={data.raceControlMessages}/>
+          <Radio />
+        </div>
+      </div>
+    </div>
+    : <h2>Connecting to Server ...</h2>}
   </div>
 }
 

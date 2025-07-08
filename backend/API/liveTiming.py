@@ -253,6 +253,7 @@ def get_live_timing(wss_t: threading.Thread) -> dict:
         session_raw_data: dict = wss.data_global.get('SessionInfo')
         lapCount_raw_data: dict = wss.data_global.get('LapCount')
         car_raw_data: dict = wss.data_global.get('CarData.z')
+        raceControlMessages_raw_data: dict = wss.data_global.get('RaceControlMessages')
     except:
         print("No live data available yet")
         return res
@@ -311,6 +312,9 @@ def get_live_timing(wss_t: threading.Thread) -> dict:
 
     # Get the extrapolated clock info
     res['clock'] = get_extrapolated_clock(clock_raw_data)
+
+    # Get the extrapolated clock info
+    res['raceControlMessages'] = raceControlMessages_raw_data.get('Messages', [])[::-1]
     
     return res
 
@@ -326,12 +330,12 @@ if __name__ == '__main__':
         try:
             # res = get_live_timing()
             # print(*res['results'], sep='\n')
-            # print(wss.data_global.get('TimingData'))
-            raw_car_data = wss.data_global.get('CarData.z')
-            compressed_bytes = base64.b64decode(raw_car_data)
-            decompressed_data = zlib.decompress(compressed_bytes, -zlib.MAX_WBITS)
-            car_data = json.loads(decompressed_data.decode('utf-8'))
-            print(car_data)
+            print(wss.data_global.get('RaceControlMessages'))
+            # raw_car_data = wss.data_global.get('CarData.z')
+            # compressed_bytes = base64.b64decode(raw_car_data)
+            # decompressed_data = zlib.decompress(compressed_bytes, -zlib.MAX_WBITS)
+            # car_data = json.loads(decompressed_data.decode('utf-8'))
+            # print(car_data)
         except Exception as e:
             print(f"Error getting live timing data: {e}")
             

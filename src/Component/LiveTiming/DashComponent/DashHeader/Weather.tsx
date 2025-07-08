@@ -1,4 +1,4 @@
-import type { weather_type } from "../../../Type/Dashtypes"
+import type { weather_type } from "../../../../Type/Dashtypes"
 
 type Props = {
   weather: weather_type;

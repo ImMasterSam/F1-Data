@@ -1,10 +1,10 @@
-import type { result_type } from "../../Type/Dashtypes"
-import Position from "./DashComponent/DashRowComponent/Position"
-import Tire from "./DashComponent/DashRowComponent/Tire"
-import Gap from "./DashComponent/DashRowComponent/Gap"
-import LapTime from "./DashComponent/DashRowComponent/LapTime"
-import Sector from "./DashComponent/DashRowComponent/Sector/Sector"
-import DrsPit from "./DashComponent/DashRowComponent/DrsPit"
+import type { result_type } from "../../../Type/Dashtypes"
+import Position from "./DashRowComponent/Position"
+import Tire from "./DashRowComponent/Tire"
+import Gap from "./DashRowComponent/Gap"
+import LapTime from "./DashRowComponent/LapTime"
+import Sector from "./DashRowComponent/Sector/Sector"
+import DrsPit from "./DashRowComponent/DrsPit"
 
 type Props = {
     result: result_type

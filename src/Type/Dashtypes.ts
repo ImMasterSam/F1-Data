@@ -91,6 +91,15 @@ export type race_type = {
   totalLaps: number;
 }
 
+export type raceControlMessages_type = {
+  Utc: string;
+  Lap: number;
+  Category: string;
+  Flag: string | null;
+  Scope: string | null;
+  Message: string;
+}
+
 export type dashData_type = {
   grandPrixName: string;
   session: string;
@@ -98,6 +107,7 @@ export type dashData_type = {
   results: result_type[];
   weather: weather_type;
   clock: clock_type;
+  raceControlMessages: raceControlMessages_type[];
   trackStatus: trackStatus_type;
   other?: quali_type | race_type;
 }
