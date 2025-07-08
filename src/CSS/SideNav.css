@@ -9,7 +9,18 @@
 }
 
 .side-bar > button {
-  padding: 20px;
+  border: none;
+  background-color: transparent;
+  color: white;
+  margin: 20px;
+  cursor: pointer;
+  display: flex;
+  justify-content: left;
+}
+
+.side-bar > button > svg {
+  min-width: 2rem;
+  min-height: 2rem;
 }
 
 .nav-item {
