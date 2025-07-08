@@ -330,7 +330,7 @@ if __name__ == '__main__':
         try:
             # res = get_live_timing()
             # print(*res['results'], sep='\n')
-            print(wss.data_global.get('RaceControlMessages'))
+            print(wss.data_global.get('TeamRadio'))
             # raw_car_data = wss.data_global.get('CarData.z')
             # compressed_bytes = base64.b64decode(raw_car_data)
             # decompressed_data = zlib.decompress(compressed_bytes, -zlib.MAX_WBITS)
