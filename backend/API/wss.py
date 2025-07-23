@@ -70,10 +70,14 @@ def connect_wss():
                     raise Exception("DriverList not found in data_global and driver_global is None")
             # print("Data received:", data_global)
 
+            subscribe_titles = ["TimingData", "TimingStats", "TimingAppData", "CarData.z", "WeatherData", "TrackStatus", "ExtrapolatedClock", "RaceControlMessages", "TeamRadio", "LapCount", "SessionInfo"]
+            if driver_global is None:
+                subscribe_titles.append("DriverList")
+
             subscribe_msg = {
                 "H": "Streaming",
                 "M": "Subscribe",
-                "A": [["TimingData", "TimingStats", "TimingAppData", "CarData.z", "WeatherData", "TrackStatus", "ExtrapolatedClock", "RaceControlMessages", "TeamRadio", "LapCount", "SessionInfo"]],
+                "A": [subscribe_titles],
                 "I": 1
             }
             ws.send(json.dumps(subscribe_msg))

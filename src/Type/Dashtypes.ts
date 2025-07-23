@@ -110,6 +110,10 @@ export type dashData_type = {
   raceControlMessages: raceControlMessages_type[];
   trackStatus: trackStatus_type;
   other?: quali_type | race_type;
+  
+  type?: 'connected' | 'data';
+  timestamp?: number;
+  error?: string;
 }
 
 export type ConnectionState = {

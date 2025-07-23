@@ -243,22 +243,22 @@ def get_live_timing() -> dict:
     res = dict()
     
     try:
-        drivers_raw_data: dict = wss.data_global.get('DriverList')
-        timing_raw_data: dict = wss.data_global.get('TimingData')
-        stats_raw_data: dict = wss.data_global.get('TimingStats')
-        tire_raw_data: dict = wss.data_global.get('TimingAppData')
-        weather_raw_data: dict = wss.data_global.get('WeatherData')
-        trackStatus_raw_data: dict = wss.data_global.get('TrackStatus')
-        clock_raw_data: dict = wss.data_global.get('ExtrapolatedClock')
-        session_raw_data: dict = wss.data_global.get('SessionInfo')
-        lapCount_raw_data: dict = wss.data_global.get('LapCount')
-        car_raw_data: dict = wss.data_global.get('CarData.z')
-        raceControlMessages_raw_data: dict = wss.data_global.get('RaceControlMessages')
+        drivers_raw_data: dict = wss.data_global['DriverList']
+        timing_raw_data: dict = wss.data_global['TimingData']
+        stats_raw_data: dict = wss.data_global['TimingStats']
+        tire_raw_data: dict = wss.data_global['TimingAppData']
+        weather_raw_data: dict = wss.data_global['WeatherData']
+        trackStatus_raw_data: dict = wss.data_global['TrackStatus']
+        clock_raw_data: dict = wss.data_global['ExtrapolatedClock']
+        session_raw_data: dict = wss.data_global['SessionInfo']
+        lapCount_raw_data: dict = wss.data_global['LapCount']
+        car_raw_data: dict = wss.data_global['CarData.z']
+        raceControlMessages_raw_data: dict = wss.data_global['RaceControlMessages']
     except:
         print("No live data available yet")
         return res
     
-    meeting_data = session_raw_data.get('Meeting', {})
+    meeting_data: dict = session_raw_data.get('Meeting', {})
     
     res['grandPrixName'] = meeting_data.get('Name', 'Unknown')
     res['country'] = meeting_data.get('Country', {}).get('Name', 'Unknown')
@@ -284,7 +284,7 @@ def get_live_timing() -> dict:
 
     # Get evey driver's current result
     result_list = []
-    for (driverNumber, data) in timing_raw_data.get('Lines').items():
+    for (driverNumber, data) in timing_raw_data.get('Lines', ).items():
 
         driver_timing_info = timing_raw_data.get('Lines', {}).get(driverNumber, {})
         driver_stats_info = stats_raw_data.get('Lines', {}).get(driverNumber, {})
