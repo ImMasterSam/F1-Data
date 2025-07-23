@@ -2,7 +2,7 @@ import json
 import urllib.parse
 import websocket
 import requests
-import asyncio
+import threading
 from time import sleep
 
 ws_global: websocket.WebSocketApp = None
@@ -35,9 +35,6 @@ def connect_wss():
     token, cookie = negotiate(hub)
     endcodedToken = urllib.parse.quote(token)
     url = f'wss://livetiming.formula1.com/signalr/connect?clientProtocol=1.5&transport=webSockets&connectionToken={endcodedToken}&connectionData={hub}'
-
-    print("token:", token)
-    print("cookie:", cookie)
 
     headers = [
         "User-Agent: BestHTTP",
@@ -98,6 +95,9 @@ def connect_wss():
     )
     ws_global = ws
     ws.run_forever(ping_interval=0.5)
+    ws.run_forever(ping_interval=0.5)
+
+wss_thread = threading.Thread(target=connect_wss, daemon=True)
 
 if __name__ == "__main__":
     connect_wss()

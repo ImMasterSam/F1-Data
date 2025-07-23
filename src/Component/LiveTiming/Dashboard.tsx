@@ -1,14 +1,14 @@
 import ReactCountryFlag from "react-country-flag";
 import DashboardRow from "./DashComponent/DashboardRow";
 import Weather from "./DashComponent/DashHeader/Weather";
-import type { dashData_type } from "../../Type/Dashtypes"
+import type { ConnectionState, dashData_type } from "../../Type/Dashtypes"
 import { Country } from "../../Lib/CountryCode";
 import TrackStatus from "./DashComponent/DashHeader/TrackStatus";
 import CountDown from "./DashComponent/DashHeader/CountDown";
 
 type dash_Props = {
   data: dashData_type | null;
-  connectStatus: boolean;
+  connectionState: ConnectionState;
 }
 
 type dashHeader_Props = {
@@ -31,7 +31,7 @@ function DashboardHeader({ data }: dashHeader_Props) {
   </div>
 }
 
-function Dashboard({ data, connectStatus }: dash_Props) {
+function Dashboard({ data, connectionState }: dash_Props) {
   return <div className="dashboard">
     {data?.grandPrixName && <DashboardHeader data={data}/>}
     {data?.weather && <Weather weather={data?.weather}/>}
@@ -40,7 +40,11 @@ function Dashboard({ data, connectStatus }: dash_Props) {
         return <DashboardRow result={result} key={result.driver.driverNumber}/>
       }) : <p>Loading Data ...</p>}
     </div>
-    <p>Connect Status: {connectStatus ? 'Connected' : 'Connecting ... (If stuck please refresh the page)'}</p>
+    <p>
+      Connection Status: {connectionState.isConnected ? '✅' : '❌'} | 
+      Retry Count: {connectionState.reconnectAttempts} | 
+      Final Data: {connectionState.lastDataTime ? new Date(connectionState.lastDataTime).toLocaleTimeString() : 'None'}
+    </p>
   </div>
 }
 

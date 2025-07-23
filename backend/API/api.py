@@ -6,6 +6,7 @@ import os
 import json
 import time
 import threading
+import logging
 
 import fastf1
 
@@ -16,8 +17,6 @@ from gevent.pywsgi import WSGIServer
 
 app = Flask(__name__)
 CORS(app, origins=['http://localhost:5173', 'https://immastersam.github.io'])
-
-wss_t = threading.Thread(target=wss.connect_wss, daemon=True)
 
 @app.route('/stream')
 def stream():
@@ -44,15 +43,38 @@ def stream_time():
 
     return Response(iter_data(), content_type='text/event-stream')
 
+def check_wss():
+    """Check if the WebSocket connection is alive."""
+
+    if not wss.wss_thread.is_alive():
+        logging.warning('WebSocket thread is not alive, starting it now.')
+        wss.wss_thread.start()
+
+    if wss.ws_global is None:
+        wss.connect_wss()
+
 @app.route('/stream/live')
 def stream_live():
 
-    global wss_t
-
     def iter_data():
 
+        check_wss()
+        
+        yield f'data:{json.dumps({"type": "connected", "timestamp": time.time()})}\n\n'
+
         while True:
-            yield 'data:' + json.dumps(get_live_timing(wss_t)) + '\n\n'
+
+            try:
+                live_data = get_live_timing()
+                if live_data is None:
+                    raise Exception("No live data available")
+                else:
+                    yield 'data:' + json.dumps(live_data) + '\n\n'
+
+            except Exception as e:
+                logging.error(f"Error in live timing stream: {e}")
+                yield 'data:' + json.dumps({"error": str(e)}) + '\n\n'
+
             time.sleep(1)
 
     return Response(iter_data(), content_type='text/event-stream')
@@ -66,6 +88,6 @@ if __name__ == '__main__':
     fastf1.set_log_level('ERROR')
     fastf1.Cache.enable_cache('cache')
 
-    wss_t.start()
+    wss.wss_thread.start()
 
     app.run(debug=True)

@@ -111,3 +111,10 @@ export type dashData_type = {
   trackStatus: trackStatus_type;
   other?: quali_type | race_type;
 }
+
+export type ConnectionState = {
+  isConnected: boolean;
+  lastDataTime: number;
+  reconnectAttempts: number;
+  error: string | null;
+}

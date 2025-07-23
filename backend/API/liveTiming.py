@@ -225,22 +225,22 @@ def get_extrapolated_clock(clock_raw_data: dict) -> dict:
     return clock
 
 
-def get_live_timing(wss_t: threading.Thread) -> dict:
+def get_live_timing() -> dict:
+    """Get the live timing data from the WebSocket connection"""
 
     global current_session
 
     # update current session
     if update_current_session():
-        wss_t.join()
-        wss_t.start()
+        wss.wss_thread = threading.Thread(target=wss.connect_wss, daemon=True)
+        wss.wss_thread.start()
+        print("Current session updated successfully.")
 
 
     # Load current session
     # session: Session = current_session.get('session')
 
     res = dict()
-
-    result_list = []
     
     try:
         drivers_raw_data: dict = wss.data_global.get('DriverList')
@@ -283,6 +283,7 @@ def get_live_timing(wss_t: threading.Thread) -> dict:
     car_data = decompressed_carData(car_raw_data)
 
     # Get evey driver's current result
+    result_list = []
     for (driverNumber, data) in timing_raw_data.get('Lines').items():
 
         driver_timing_info = timing_raw_data.get('Lines', {}).get(driverNumber, {})
