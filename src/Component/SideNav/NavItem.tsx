@@ -13,7 +13,7 @@ type Props = {
 
 
 function NavItem({ navItem, index, isExpanded }: Props) {
-  return <Link to={navItem.href} className='nav-item' key={index}>
+  return <Link title={navItem.label} to={navItem.href} className='nav-item' key={index}>
     {navItem.icon}
     {isExpanded && <h3>{navItem.label}</h3>}
   </Link>

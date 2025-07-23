@@ -5,6 +5,7 @@ import type { ConnectionState, dashData_type } from "../../Type/Dashtypes"
 import { Country } from "../../Lib/CountryCode";
 import TrackStatus from "./DashComponent/DashHeader/TrackStatus";
 import CountDown from "./DashComponent/DashHeader/CountDown";
+import { useState } from "react";
 
 type dash_Props = {
   data: dashData_type | null;
@@ -32,12 +33,19 @@ function DashboardHeader({ data }: dashHeader_Props) {
 }
 
 function Dashboard({ data, connectionState }: dash_Props) {
+
+  const [intervalTop, setIntervalTop] = useState<boolean>(true)
+
+  const handleGapTop = () => {
+    setIntervalTop(!intervalTop)
+  }
+
   return <div className="dashboard">
     {data?.grandPrixName && <DashboardHeader data={data}/>}
     {data?.weather && <Weather weather={data?.weather}/>}
     <div className="drivers-table">
       {data?.results ? data.results.map((result) => {
-        return <DashboardRow result={result} key={result.driver.driverNumber}/>
+        return <DashboardRow result={result} intervalTop={intervalTop} handleGapTop={handleGapTop} key={result.driver.driverNumber}/>
       }) : <p>Loading Data ...</p>}
     </div>
     <p>

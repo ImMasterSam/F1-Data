@@ -143,6 +143,7 @@
     text-align: Left;
     display: flex;
     flex-direction: column;
+    cursor: pointer;
 }
 
 .laptime-field {
@@ -187,7 +188,7 @@
     font-size: 0.9rem;
 }
 
-.tire-laps, .gap-toleader, .laptime-best, .sector-best {
+.tire-laps, .gap-small, .laptime-best, .sector-best  {
     opacity: 0.7;
 }
 
