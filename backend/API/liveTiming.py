@@ -224,6 +224,26 @@ def get_extrapolated_clock(clock_raw_data: dict) -> dict:
 
     return clock
 
+def get_team_radio_info(radio_raw_data: dict, session_raw_data: dict, drivers_raw_data: dict) -> list:
+    """Get the team radio info"""
+
+    team_radio = []
+    radio_messages = radio_raw_data.get('Captures', [])[::-1]
+    session_path = session_raw_data.get('Path', '')
+
+    # Convert radio messages to the desired format
+    for message in radio_messages:
+        audio_path = message.get('Path', '')
+        radio = {
+            'Path': f"https://livetiming.formula1.com/static/{session_path}{audio_path}",
+            'Utc': message.get('Utc', ''),
+            'driver': get_driver_info(message.get('RacingNumber', '0'), drivers_raw_data),
+        }
+
+        team_radio.append(radio)
+
+    return team_radio
+
 
 def get_live_timing() -> dict:
     """Get the live timing data from the WebSocket connection"""
@@ -254,6 +274,7 @@ def get_live_timing() -> dict:
         lapCount_raw_data: dict = wss.data_global['LapCount']
         car_raw_data: dict = wss.data_global['CarData.z']
         raceControlMessages_raw_data: dict = wss.data_global['RaceControlMessages']
+        radio_raw_data: dict = wss.data_global['TeamRadio']
     except:
         print("No live data available yet")
         return res
@@ -316,6 +337,9 @@ def get_live_timing() -> dict:
 
     # Get the extrapolated clock info
     res['raceControlMessages'] = raceControlMessages_raw_data.get('Messages', [])[::-1]
+
+    # Get the radio info
+    res['teamRadio'] = get_team_radio_info(radio_raw_data, session_raw_data, drivers_raw_data)
     
     return res
 
@@ -331,7 +355,7 @@ if __name__ == '__main__':
         try:
             # res = get_live_timing()
             # print(*res['results'], sep='\n')
-            print(wss.data_global.get('TeamRadio'))
+            print(wss.data_global.get('SessionInfo'))
             # raw_car_data = wss.data_global.get('CarData.z')
             # compressed_bytes = base64.b64decode(raw_car_data)
             # decompressed_data = zlib.decompress(compressed_bytes, -zlib.MAX_WBITS)

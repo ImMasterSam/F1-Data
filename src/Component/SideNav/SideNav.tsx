@@ -28,7 +28,7 @@ function SideNav() {
       {isExpanded ? <LuPanelRightOpen /> : <LuPanelLeftOpen />}
     </button>
     {NavItems.map((nav, index) => {
-      return <NavItem navItem={nav} index={index} isExpanded={isExpanded}/>
+      return <NavItem navItem={nav} index={index} isExpanded={isExpanded} key={index}/>
     })}
   </nav>
 }

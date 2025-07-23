@@ -100,6 +100,12 @@ export type raceControlMessages_type = {
   Message: string;
 }
 
+export type teamRadio_type = {
+  Utc: string;
+  Path: string;
+  driver: driver_type;
+}
+
 export type dashData_type = {
   grandPrixName: string;
   session: string;
@@ -108,6 +114,7 @@ export type dashData_type = {
   weather: weather_type;
   clock: clock_type;
   raceControlMessages: raceControlMessages_type[];
+  teamRadio: teamRadio_type[];
   trackStatus: trackStatus_type;
   other?: quali_type | race_type;
   

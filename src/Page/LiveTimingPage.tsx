@@ -194,8 +194,8 @@ function LiveTimingPage() {
       <div className="dash-info">
         <Map />
         <div className='message-info'>
-          {data.raceControlMessages && <RaceControl raceControlMessages={data.raceControlMessages}/>}
-          <Radio />
+          {data.raceControlMessages && <RaceControl raceControlMessages={data.raceControlMessages} />}
+          {data.teamRadio && <Radio teamRadio={data.teamRadio} />}
         </div>
       </div>
     </div>
