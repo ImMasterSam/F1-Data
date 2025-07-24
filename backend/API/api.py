@@ -89,9 +89,5 @@ if __name__ == '__main__':
     fastf1.Cache.enable_cache('cache')
 
     wss.wss_thread.start()
-    while liveTiming.current_session is None:
-        liveTiming.get_live_timing()
-        time.sleep(1)
 
-    print('[INFO] Live timing data is ready.')
     app.run(debug=True)

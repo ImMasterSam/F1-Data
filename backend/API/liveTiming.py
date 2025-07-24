@@ -63,28 +63,30 @@ def decompressed_posData(pos_raw_data: dict) -> dict:
 
     return position_data.get('Position', [0])[-1].get('Entries', {})
 
-def get_circuit_corners() -> list:
+def get_circuit_corners(meeting_data: dict) -> list:
     """Get the circuit corners from the current session"""
 
-    global current_session
+    circuit_key = int(meeting_data.get('Circuit', {}).get('Key', 0))
+    current_time = datetime.datetime.now(tz=datetime.timezone.utc)
+    circuit = get_circuit(year=current_time.year, circuit_key=circuit_key)
 
     if current_session is None:
         return []
     
-    circuit_corners = current_session.get_circuit_info().corners
+    circuit_corners = circuit.get('corners', [])
 
     corners = []
-    for (idx, corner) in circuit_corners.iterrows():
+    for corner in circuit_corners:
         corners.append({
-            'x': corner['X'],
-            'y': corner['Y'],
-            'number': corner['Number'],
-            'angle': corner['Angle'],
+            'x': float(corner.get('trackPosition', {}).get('x', 0)),
+            'y': float(corner.get('trackPosition', {}).get('y', 0)),
+            'number': int(corner.get('number', 0)),
+            'angle': float(corner.get('angle', 0)),
         })
 
     return corners
 
-def get_track_path(meeting_data: dict) -> list[tuple[int, int]]:
+def get_track_path(meeting_data: dict) -> list[tuple[float, float]]:
     """Get the track path from the multiview API (fastf1.mvapi)"""
     
     circuit_key = int(meeting_data.get('Circuit', {}).get('Key', 0))
@@ -94,7 +96,7 @@ def get_track_path(meeting_data: dict) -> list[tuple[int, int]]:
     path = []
 
     for (x, y) in zip(circuit.get('x', []), circuit.get('y', [])):
-        path.append((int(x), int(y)))
+        path.append((float(x), float(y)))
 
     return path
 
@@ -109,8 +111,8 @@ def get_driver_position(pos_data: dict, driver_raw_data: dict) -> list[dict]:
         
         driver_info = get_driver_info(driver_number, driver_raw_data)
         position = {
-            'x': int(pos_info.get('X', 0)),
-            'y': int(pos_info.get('Y', 0)),
+            'x': float(pos_info.get('X', 0)),
+            'y': float(pos_info.get('Y', 0)),
         }
 
         driver_position = {
@@ -127,7 +129,7 @@ def get_circuit_info(meeting_data: dict, pos_data: dict, driver_raw_data: dict) 
 
     circuit = {
         'trackName': meeting_data.get('Circuit', {}).get('ShortName', 'Unknown'),
-        'corners': get_circuit_corners(),
+        'corners': get_circuit_corners(meeting_data),
         'trackPath': get_track_path(meeting_data),
         'driverPos': get_driver_position(pos_data, driver_raw_data),
         'rotation': current_session.get_circuit_info().rotation,
