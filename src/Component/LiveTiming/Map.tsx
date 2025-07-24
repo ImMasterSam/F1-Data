@@ -1,4 +1,4 @@
-import type { circuit_type, corner_type } from "../../Type/Dashtypes"
+import type { circuit_type, corner_type, driverPos_type } from "../../Type/Dashtypes"
 
 type Map_Props = {
   circuit: circuit_type;
@@ -7,10 +7,11 @@ type Map_Props = {
 type Graph_Props = {
   corners: corner_type[];
   trackPath: [number, number][];
+  driverPos: driverPos_type[];
   rotation: number;
 }
 
-function Graph({ corners, trackPath, rotation }: Graph_Props) {
+function Graph({ corners, trackPath, driverPos, rotation }: Graph_Props) {
 
   // Rotate The Graph First
   const xs = trackPath.map(p => p[0])
@@ -19,9 +20,9 @@ function Graph({ corners, trackPath, rotation }: Graph_Props) {
   const py = (Math.max(...ys) -  Math.min(...ys)) / 2
 
   const rad = (deg: number) => deg * (Math.PI / 180);
-  const rotate = (x: number, y: number, a: number, px: number, py: number): [number, number] => {
-    const c = Math.cos(rad(a));
-    const s = Math.sin(rad(a));
+  const rotate = (x: number, y: number): [number, number] => {
+    const c = Math.cos(rad(rotation));
+    const s = Math.sin(rad(rotation));
 
     x -= px;
     y -= py;
@@ -32,7 +33,7 @@ function Graph({ corners, trackPath, rotation }: Graph_Props) {
     return [newX + px, (newY + py) * -1];
   }
 
-  const rotated_path = trackPath.map(c => rotate(c[0], c[1], rotation, px, py))
+  const rotated_path = trackPath.map(c => rotate(c[0], c[1]))
 
   // get minimun for resizing
   const rxs = rotated_path.map(p => p[0])
@@ -83,18 +84,41 @@ function Graph({ corners, trackPath, rotation }: Graph_Props) {
     <path
       d={points}
       fill="none"
-      stroke="#AAA"
+      stroke="#DDD"
       strokeLinejoin="round"
-      strokeWidth={5}
+      strokeWidth={4}
     />
     {corners.map((c, i) => {
-      const [rx, ry] = rotate(c.x, c.y, rotation, px, py)
+      const [rx, ry] = rotate(c.x, c.y)
       const [nx, ny] = norm(rx, ry)
       const [cx, cy] = shiftPoints(nx, ny, c.angle, shiftLen)
       return (
         <g key={i}>
-          <circle cx={cx} cy={cy} r={6} />
           <text x={cx} y={cy} textAnchor="middle" fontSize="10" fill="#555">{c.number}</text>
+        </g>
+      );
+    })}
+    {driverPos.map((driverPos, i) => {
+      const [rx, ry] = rotate(driverPos.position.x, driverPos.position.y)
+      const [cx, cy] = norm(rx, ry)
+      return (
+        <g key={i}>
+          <circle 
+            cx={cx}
+            cy={cy}
+            r={6}
+            fill={`#${driverPos.driver.driverTeamColor}`}
+            style={{ transition: "cx 0.5s, cy 0.5s" }}
+          />
+          <text
+            x={cx + 15}
+            y={cy - 8}
+            textAnchor="middle"
+            fontSize="12"
+            fontWeight="800"
+            fill={`#${driverPos.driver.driverTeamColor}`}
+            style={{ transition: "x 0.5s, y 0.5s" }}
+          >{driverPos.driver.driverAbbreviation}</text>
         </g>
       );
     })}
@@ -105,7 +129,7 @@ function Graph({ corners, trackPath, rotation }: Graph_Props) {
 function Map({ circuit }: Map_Props) {
   return <div className="map">
     <h2>{circuit.trackName}</h2>
-    <Graph corners={circuit.corners} trackPath={circuit.trackPath} rotation={circuit.rotation}/>
+    <Graph corners={circuit.corners} trackPath={circuit.trackPath} driverPos={circuit.driverPos} rotation={circuit.rotation}/>
   </div>
 }
 

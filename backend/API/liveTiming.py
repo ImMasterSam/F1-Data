@@ -39,17 +39,29 @@ def update_current_session(grandPrix: str, session_type: str) -> bool:
     
     return False
             
-def decompressed_carData(raw_car_data: dict) -> dict:
+def decompressed_carData(car_raw_data: dict) -> dict:
     """Decompress the car data from the raw data"""
 
-    if not raw_car_data:
+    if not car_raw_data:
         return {}
 
-    compressed_bytes = base64.b64decode(raw_car_data)
+    compressed_bytes = base64.b64decode(car_raw_data)
     decompressed_data = zlib.decompress(compressed_bytes, -zlib.MAX_WBITS)
     car_data = json.loads(decompressed_data.decode('utf-8'))
 
     return car_data.get('Entries', [0])[-1].get('Cars', {})
+
+def decompressed_posData(pos_raw_data: dict) -> dict:
+    """Decompress the car data from the raw data"""
+
+    if not pos_raw_data:
+        return {}
+
+    compressed_bytes = base64.b64decode(pos_raw_data)
+    decompressed_data = zlib.decompress(compressed_bytes, -zlib.MAX_WBITS)
+    position_data = json.loads(decompressed_data.decode('utf-8'))
+
+    return position_data.get('Position', [0])[-1].get('Entries', {})
 
 def get_circuit_corners() -> list:
     """Get the circuit corners from the current session"""
@@ -86,13 +98,38 @@ def get_track_path(meeting_data: dict) -> list[tuple[int, int]]:
 
     return path
 
-def get_circuit_info(meeting_data: dict) -> dict:
+def get_driver_position(pos_data: dict, driver_raw_data: dict) -> list[dict]:
+    """Get the driver position from the position data and driver raw data"""
+
+    driver_positions = []
+
+    for (driver_number, pos_info) in pos_data.items():
+        if driver_number not in driver_raw_data:
+            continue
+        
+        driver_info = get_driver_info(driver_number, driver_raw_data)
+        position = {
+            'x': int(pos_info.get('X', 0)),
+            'y': int(pos_info.get('Y', 0)),
+        }
+
+        driver_position = {
+            'driver': driver_info,
+            'position': position,
+        }
+
+        driver_positions.append(driver_position)
+
+    return driver_positions
+
+def get_circuit_info(meeting_data: dict, pos_data: dict, driver_raw_data: dict) -> dict:
     """Get the current circuit info"""
 
     circuit = {
         'trackName': meeting_data.get('Circuit', {}).get('ShortName', 'Unknown'),
         'corners': get_circuit_corners(),
         'trackPath': get_track_path(meeting_data),
+        'driverPos': get_driver_position(pos_data, driver_raw_data),
         'rotation': current_session.get_circuit_info().rotation,
     }
 
@@ -301,6 +338,7 @@ def get_live_timing() -> dict:
         session_raw_data: dict = wss.data_global['SessionInfo']
         lapCount_raw_data: dict = wss.data_global['LapCount']
         car_raw_data: dict = wss.data_global['CarData.z']
+        pos_raw_data: dict = wss.data_global['Position.z']
         raceControlMessages_raw_data: dict = wss.data_global['RaceControlMessages']
         radio_raw_data: dict = wss.data_global['TeamRadio']
     except:
@@ -320,8 +358,9 @@ def get_live_timing() -> dict:
         wss.wss_thread = threading.Thread(target=wss.connect_wss, daemon=True)
         wss.wss_thread.start()
         print("Current session updated successfully.")
-        
-    res['circuit'] = get_circuit_info(meeting_data)
+    
+    position_data = decompressed_posData(pos_raw_data)
+    res['circuit'] = get_circuit_info(meeting_data, position_data, drivers_raw_data)
     
     # Qualifying handling
     session_part = timing_raw_data.get('SessionPart', '')

@@ -5,10 +5,19 @@ export type corner_type = {
   number: number;
 }
 
+export type driverPos_type = {
+  driver: driver_type;
+  position: {
+    x: number;
+    y: number;
+  };
+}
+
 export type circuit_type = {
   trackName: string;
   corners: corner_type[];
   trackPath: [number, number][];
+  driverPos: driverPos_type[];
   rotation: number;
 }
 
