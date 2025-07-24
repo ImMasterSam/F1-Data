@@ -39,7 +39,7 @@ function Graph({ corners, trackPath, rotation }: Graph_Props) {
   const rys = rotated_path.map(p => p[1])
   const maxX = Math.max(...rxs), minX = Math.min(...rxs)
   const maxY = Math.max(...rys), minY = Math.min(...rys)
-  const padding = 20
+  const padding = 30
 
   const norm = (x: number, y: number): [number, number] => {
     const originalWidth = maxX - minX;
@@ -59,10 +59,27 @@ function Graph({ corners, trackPath, rotation }: Graph_Props) {
   }
 
   const norm_path = [...rotated_path, rotated_path[0]].map(c => norm(c[0], c[1]))
-
   const points = `M${norm_path[0][0]},${norm_path[0][1]} ${norm_path.map(([x, y]) => `L${x},${y}`).join(" ")}`
 
+  const shiftLen = 20
+  const shiftPoints = (x: number, y: number, a: number, dis: number): [number, number] => {
+    const c = Math.cos(rad(a + 90));
+    const s = Math.sin(rad(a + 90));
+    
+    const newX = x + c * dis;
+    const newY = y - s * dis;
+
+    return [newX, newY]
+  }
+
   return <svg width={800} height={400} >
+    <path
+      d={points}
+      fill="none"
+      stroke="#222"
+      strokeLinejoin="round"
+      strokeWidth={20}
+    />
     <path
       d={points}
       fill="none"
@@ -72,11 +89,12 @@ function Graph({ corners, trackPath, rotation }: Graph_Props) {
     />
     {corners.map((c, i) => {
       const [rx, ry] = rotate(c.x, c.y, rotation, px, py)
-      const [cx, cy] = norm(rx, ry)
+      const [nx, ny] = norm(rx, ry)
+      const [cx, cy] = shiftPoints(nx, ny, c.angle, shiftLen)
       return (
         <g key={i}>
-          <circle cx={cx} cy={cy} r={6} fill="#2196f3" />
-          <text x={cx} y={cy + 4} textAnchor="middle" fontSize="10" fill="#fff">{c.number}</text>
+          <circle cx={cx} cy={cy} r={6} />
+          <text x={cx} y={cy} textAnchor="middle" fontSize="10" fill="#555">{c.number}</text>
         </g>
       );
     })}

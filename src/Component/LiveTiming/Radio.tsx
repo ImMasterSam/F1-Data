@@ -96,7 +96,7 @@ function RadioPlayer({ radio }: RadioPlayer_Props) {
         onChange={handleSeek}
         step="0.25"
         style={{
-          background: `linear-gradient(to right, #2196f3 0%, #2196f3 ${percent}%, #555 ${percent}%, #555 100%)`
+          background: `linear-gradient(to right, #${radio.driver.driverTeamColor} 0%, #${radio.driver.driverTeamColor} ${percent}%, #555 ${percent}%, #555 100%)`
         }}
       />
       <audio ref={audioRef} src={radio.Path}></audio>
