@@ -51,7 +51,7 @@ function Dashboard({ data, connectionState }: dash_Props) {
     <p>
       Connection Status: {connectionState.isConnected ? '✅' : '❌'} | 
       Retry Count: {connectionState.reconnectAttempts} | 
-      Final Data: {connectionState.lastDataTime ? new Date(connectionState.lastDataTime).toLocaleTimeString() : 'None'}
+      Last Received Time: {connectionState.lastDataTime ? new Date(connectionState.lastDataTime).toLocaleTimeString() : 'None'}
     </p>
   </div>
 }

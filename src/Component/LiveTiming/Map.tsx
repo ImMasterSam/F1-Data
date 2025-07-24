@@ -1,7 +1,94 @@
-function Map() {
-    return <div className="map">
-        <p>This is map</p>
-    </div>
+import type { circuit_type, corner_type } from "../../Type/Dashtypes"
+
+type Map_Props = {
+  circuit: circuit_type;
+}
+
+type Graph_Props = {
+  corners: corner_type[];
+  trackPath: [number, number][];
+  rotation: number;
+}
+
+function Graph({ corners, trackPath, rotation }: Graph_Props) {
+
+  // Rotate The Graph First
+  const xs = trackPath.map(p => p[0])
+  const ys = trackPath.map(p => p[1])
+  const px = (Math.max(...xs) - Math.min(...xs)) / 2
+  const py = (Math.max(...ys) -  Math.min(...ys)) / 2
+
+  const rad = (deg: number) => deg * (Math.PI / 180);
+  const rotate = (x: number, y: number, a: number, px: number, py: number): [number, number] => {
+    const c = Math.cos(rad(a));
+    const s = Math.sin(rad(a));
+
+    x -= px;
+    y -= py;
+
+    const newX = x * c - y * s;
+    const newY = y * c + x * s;
+
+    return [newX + px, (newY + py) * -1];
+  }
+
+  const rotated_path = trackPath.map(c => rotate(c[0], c[1], rotation, px, py))
+
+  // get minimun for resizing
+  const rxs = rotated_path.map(p => p[0])
+  const rys = rotated_path.map(p => p[1])
+  const maxX = Math.max(...rxs), minX = Math.min(...rxs)
+  const maxY = Math.max(...rys), minY = Math.min(...rys)
+  const padding = 20
+
+  const norm = (x: number, y: number): [number, number] => {
+    const originalWidth = maxX - minX;
+    const originalHeight = maxY - minY;
+    const targetWidth = 800 - 2 * padding;
+    const targetHeight = 400 - 2 * padding;
+
+    const scale = Math.min(targetWidth / originalWidth, targetHeight / originalHeight);
+
+    const offsetX = (targetWidth - originalWidth * scale) / 2;
+    const offsetY = (targetHeight - originalHeight * scale) / 2;
+
+    return [
+      padding + offsetX + (x - minX) * scale,
+      padding + offsetY + (y - minY) * scale
+    ];
+  }
+
+  const norm_path = [...rotated_path, rotated_path[0]].map(c => norm(c[0], c[1]))
+
+  const points = `M${norm_path[0][0]},${norm_path[0][1]} ${norm_path.map(([x, y]) => `L${x},${y}`).join(" ")}`
+
+  return <svg width={800} height={400} >
+    <path
+      d={points}
+      fill="none"
+      stroke="#AAA"
+      strokeLinejoin="round"
+      strokeWidth={5}
+    />
+    {corners.map((c, i) => {
+      const [rx, ry] = rotate(c.x, c.y, rotation, px, py)
+      const [cx, cy] = norm(rx, ry)
+      return (
+        <g key={i}>
+          <circle cx={cx} cy={cy} r={6} fill="#2196f3" />
+          <text x={cx} y={cy + 4} textAnchor="middle" fontSize="10" fill="#fff">{c.number}</text>
+        </g>
+      );
+    })}
+  </svg>
+  
+}
+
+function Map({ circuit }: Map_Props) {
+  return <div className="map">
+    <h2>{circuit.trackName}</h2>
+    <Graph corners={circuit.corners} trackPath={circuit.trackPath} rotation={circuit.rotation}/>
+  </div>
 }
 
 export default Map

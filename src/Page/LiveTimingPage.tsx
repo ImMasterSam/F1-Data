@@ -192,7 +192,7 @@ function LiveTimingPage() {
     ? <div className="dash-container">
       <Dashboard data={data} connectionState={connectionState} />
       <div className="dash-info">
-        <Map />
+        {data.circuit && <Map circuit={data.circuit}/>}
         <div className='message-info'>
           {data.raceControlMessages && <RaceControl raceControlMessages={data.raceControlMessages} />}
           {data.teamRadio && <Radio teamRadio={data.teamRadio} />}

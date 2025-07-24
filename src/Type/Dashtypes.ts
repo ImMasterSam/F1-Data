@@ -1,3 +1,17 @@
+export type corner_type = {
+  x: number;
+  y: number;
+  angle: number;
+  number: number;
+}
+
+export type circuit_type = {
+  trackName: string;
+  corners: corner_type[];
+  trackPath: [number, number][];
+  rotation: number;
+}
+
 export type driver_type = {
   driverNumber: number;
   driverFullName: string;
@@ -110,6 +124,7 @@ export type dashData_type = {
   grandPrixName: string;
   session: string;
   country: string;
+  circuit: circuit_type;
   results: result_type[];
   weather: weather_type;
   clock: clock_type;

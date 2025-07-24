@@ -1,6 +1,8 @@
 import fastf1
 from fastf1.livetiming.data import LiveTimingData
 from fastf1.core import Session, Lap
+from fastf1.mvapi.api import get_circuit
+from fastf1.events import Event
 
 import base64
 import zlib
@@ -12,44 +14,30 @@ import time
 
 import wss
 
-current_session = {
-    'updateTime': datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(hours=5),
-    'session': None
-}
+current_session: Session = None
 
-def update_current_session() -> bool:
+def update_current_session(grandPrix: str, session_type: str) -> bool:
     """Get the current live session""" 
 
     global current_session
 
     # Check if the current session is still valid
     current_time = datetime.datetime.now(tz=datetime.timezone.utc)
-    if current_time - current_session['updateTime'] < datetime.timedelta(minutes=5):
-        return False
 
-    try:
-        schedule = fastf1.get_event_schedule(current_time.year)
-    except:
-        try:
-            schedule = fastf1.get_event_schedule(2025)
-        except:
-            raise ValueError(f"Failed to load any schedule data. ({current_time})")
-    target_time = current_time + datetime.timedelta(minutes=15)  # Look for sessions starting within the last 5 minutes
-
-    for round, event in schedule[::-1].iterrows():
-        # print(event)
-
-        for session in range(5, 0, -1):
-            session_timestamp: pd.Timestamp = event[f'Session{session}Date']
-            session_time = session_timestamp.to_pydatetime()
-            session_time = session_time.astimezone(tz=datetime.timezone.utc) 
-            if session_time <= target_time:
-                current_session = {
-                    'updateTime': current_time,
-                    'session': fastf1.get_session(current_time.year, event['RoundNumber'], session)
-                } 
-                current_session['session'].load(laps=False, weather=False, telemetry=False)
-                return True
+    if current_session is None:
+        current_session = fastf1.get_session(current_time.year, grandPrix, session_type)
+        current_session.load(laps=True, weather=False, telemetry=False)
+        return True
+    
+    current_session_info = current_session.session_info
+    current_gp = current_session_info.get('Meeting', {}).get('Name', 'Unknown')
+    current_session_type = current_session_info.get('Type', 'Unknown')
+    if current_gp != grandPrix or current_session_type != session_type:
+        current_session = fastf1.get_session(current_time.year, grandPrix, session_type)
+        current_session.load(laps=True, weather=False, telemetry=False)
+        return True
+    
+    return False
             
 def decompressed_carData(raw_car_data: dict) -> dict:
     """Decompress the car data from the raw data"""
@@ -62,6 +50,53 @@ def decompressed_carData(raw_car_data: dict) -> dict:
     car_data = json.loads(decompressed_data.decode('utf-8'))
 
     return car_data.get('Entries', [0])[-1].get('Cars', {})
+
+def get_circuit_corners() -> list:
+    """Get the circuit corners from the current session"""
+
+    global current_session
+
+    if current_session is None:
+        return []
+    
+    circuit_corners = current_session.get_circuit_info().corners
+
+    corners = []
+    for (idx, corner) in circuit_corners.iterrows():
+        corners.append({
+            'x': corner['X'],
+            'y': corner['Y'],
+            'number': corner['Number'],
+            'angle': corner['Angle'],
+        })
+
+    return corners
+
+def get_track_path(meeting_data: dict) -> list[tuple[int, int]]:
+    """Get the track path from the multiview API (fastf1.mvapi)"""
+    
+    circuit_key = int(meeting_data.get('Circuit', {}).get('Key', 0))
+    current_time = datetime.datetime.now(tz=datetime.timezone.utc)
+    circuit = get_circuit(year=current_time.year, circuit_key=circuit_key)
+
+    path = []
+
+    for (x, y) in zip(circuit.get('x', []), circuit.get('y', [])):
+        path.append((int(x), int(y)))
+
+    return path
+
+def get_circuit_info(meeting_data: dict) -> dict:
+    """Get the current circuit info"""
+
+    circuit = {
+        'trackName': meeting_data.get('Circuit', {}).get('ShortName', 'Unknown'),
+        'corners': get_circuit_corners(),
+        'trackPath': get_track_path(meeting_data),
+        'rotation': current_session.get_circuit_info().rotation,
+    }
+
+    return circuit
             
 def get_driver_info(driver_number: str, drivers_raw_data: dict) -> dict:
     """Get the driver info for a given driver number"""
@@ -250,13 +285,6 @@ def get_live_timing() -> dict:
 
     global current_session
 
-    # update current session
-    if update_current_session():
-        wss.wss_thread = threading.Thread(target=wss.connect_wss, daemon=True)
-        wss.wss_thread.start()
-        print("Current session updated successfully.")
-
-
     # Load current session
     # session: Session = current_session.get('session')
 
@@ -286,6 +314,14 @@ def get_live_timing() -> dict:
     
     session_type = session_raw_data.get('Type', 'Unknown')
     res['session'] = session_raw_data.get('Name', 'Unknown')
+    
+    # update current session
+    if update_current_session(res['grandPrixName'], session_type):
+        wss.wss_thread = threading.Thread(target=wss.connect_wss, daemon=True)
+        wss.wss_thread.start()
+        print("Current session updated successfully.")
+        
+    res['circuit'] = get_circuit_info(meeting_data)
     
     # Qualifying handling
     session_part = timing_raw_data.get('SessionPart', '')
@@ -355,8 +391,8 @@ if __name__ == '__main__':
         try:
             # res = get_live_timing()
             # print(*res['results'], sep='\n')
-            print(wss.data_global.get('SessionInfo'))
-            # raw_car_data = wss.data_global.get('CarData.z')
+            print(wss.data_global.get("SessionInfo"))
+            # raw_car_data = wss.data_global.get('Position.z')
             # compressed_bytes = base64.b64decode(raw_car_data)
             # decompressed_data = zlib.decompress(compressed_bytes, -zlib.MAX_WBITS)
             # car_data = json.loads(decompressed_data.decode('utf-8'))
