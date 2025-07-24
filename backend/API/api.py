@@ -1,6 +1,6 @@
 import wss
 from data import *
-from liveTiming import get_live_timing
+import liveTiming
 
 import os
 import json
@@ -65,7 +65,7 @@ def stream_live():
         while True:
 
             try:
-                live_data = get_live_timing()
+                live_data = liveTiming.get_live_timing()
                 if live_data is None:
                     raise Exception("No live data available")
                 else:
@@ -89,5 +89,9 @@ if __name__ == '__main__':
     fastf1.Cache.enable_cache('cache')
 
     wss.wss_thread.start()
+    while liveTiming.current_session is None:
+        liveTiming.get_live_timing()
+        time.sleep(1)
 
+    print('[INFO] Live timing data is ready.')
     app.run(debug=True)
