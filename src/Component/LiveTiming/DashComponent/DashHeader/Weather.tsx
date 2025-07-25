@@ -10,7 +10,7 @@ function Weather({ weather }: Props) {
     <p>AirTemp: {weather.airTemp}°C</p>
     <p>Humidity: {weather.humidity}%</p>
     <p>Pressure: {weather.pressure} hPa</p>
-    <p>Rain: {weather.rainfall}</p>
+    <p>Rain: {weather.rainfall ? '✅' : '❌'}</p>
     <p>TrackTemp: {weather.trackTemp}°C</p>
     <p>WindDirection: {weather.windDirection}°</p>
     <p>WindSpeed: {weather.windSpeed} km/h</p>
