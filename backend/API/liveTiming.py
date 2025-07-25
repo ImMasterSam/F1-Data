@@ -157,7 +157,7 @@ def get_drspit_info(driver_timing_info: dict, car_info: dict) -> dict:
     DRS_ENABLED = {10, 12, 14}
 
     drs_raw = car_info.get('Channels', {}).get('45', 0)
-    if drs_raw in DRS_ENABLED:
+    if drs_raw > 9:
         drs_status = 2  # DRS is enabled
     elif drs_raw == 8:
         drs_status = 1  # DRS is ready
@@ -339,7 +339,6 @@ def get_live_timing() -> dict:
         trackStatus_raw_data: dict = wss.data_global['TrackStatus']
         clock_raw_data: dict = wss.data_global['ExtrapolatedClock']
         session_raw_data: dict = wss.data_global['SessionInfo']
-        lapCount_raw_data: dict = wss.data_global['LapCount']
         car_raw_data: dict = wss.data_global['CarData.z']
         pos_raw_data: dict = wss.data_global['Position.z']
         raceControlMessages_raw_data: dict = wss.data_global['RaceControlMessages']
@@ -372,9 +371,12 @@ def get_live_timing() -> dict:
         entries = timing_raw_data.get('NoEntries', [])[int(session_part) % 3]
     else:
         entries = 999
+    
+    
 
     # Race handling
     if session_type == 'Race':
+        lapCount_raw_data: dict = wss.data_global['LapCount']
         res['other'] = { 'currentLap': int(lapCount_raw_data.get('CurrentLap', 0)),
                          'totalLaps': int(lapCount_raw_data.get('TotalLaps', 0))}
         

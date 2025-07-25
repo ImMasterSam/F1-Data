@@ -102,22 +102,22 @@ function Graph({ corners, trackPath, driverPos, rotation }: Graph_Props) {
       const [rx, ry] = rotate(driverPos.position.x, driverPos.position.y)
       const [cx, cy] = norm(rx, ry)
       return (
-        <g key={i}>
+        <g key={i}
+           style={{
+             transform: `translate(${cx}px, ${cy}px)`,
+             transition: "transform 1.2s linear"
+           }}>
           <circle 
-            cx={cx}
-            cy={cy}
             r={6}
             fill={`#${driverPos.driver.driverTeamColor}`}
-            style={{ transition: "cx 0.5s, cy 0.5s" }}
           />
           <text
-            x={cx + 15}
-            y={cy - 8}
+            x={+15}
+            y={-8}
             textAnchor="middle"
             fontSize="12"
             fontWeight="800"
             fill={`#${driverPos.driver.driverTeamColor}`}
-            style={{ transition: "x 0.5s, y 0.5s" }}
           >{driverPos.driver.driverAbbreviation}</text>
         </g>
       );

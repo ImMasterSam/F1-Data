@@ -28,7 +28,7 @@ const get_bgColor = (mes: raceControlMessages_type) => {
 
 function MessageBox({ mes }: BoxProps) {
   return <div className="message-box" style={{backgroundColor: get_bgColor(mes)}}>
-    <p className="time">{`Lap ${mes.Lap} - ${new Date(mes.Utc+'Z').toLocaleString()}`}</p>
+    <p className="time">{`${mes.Lap ? `Lap - ${mes.Lap} ` : ''}${new Date(mes.Utc+'Z').toLocaleString()}`}</p>
     <p className="message">{mes.Message}</p>
   </div>
 }
