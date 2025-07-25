@@ -14,7 +14,7 @@ import time
 
 import wss
 
-current_session: Session = None
+current_session: dict = None
 
 def update_current_session(grandPrix: str, session_type: str) -> bool:
     """Get the current live session""" 
@@ -25,16 +25,21 @@ def update_current_session(grandPrix: str, session_type: str) -> bool:
     current_time = datetime.datetime.now(tz=datetime.timezone.utc)
 
     if current_session is None:
-        current_session = fastf1.get_session(current_time.year, grandPrix, session_type)
-        current_session.load(laps=True, weather=False, telemetry=False)
+        current_session = {
+            'year': current_time.year,
+            'grandPrix': grandPrix,
+            'session': session_type,
+        }
         return True
     
-    current_session_info = current_session.session_info
-    current_gp = current_session_info.get('Meeting', {}).get('Name', 'Unknown')
-    current_session_type = current_session_info.get('Type', 'Unknown')
+    current_gp = current_session.get('grandPrix', 'Unknown')
+    current_session_type = current_session.get('session', 'Unknown')
     if current_gp != grandPrix or current_session_type != session_type:
-        current_session = fastf1.get_session(current_time.year, grandPrix, session_type)
-        current_session.load(laps=True, weather=False, telemetry=False)
+        current_session = {
+            'year': current_time.year,
+            'grandPrix': grandPrix,
+            'session': session_type,
+        }
         return True
     
     return False
@@ -63,14 +68,10 @@ def decompressed_posData(pos_raw_data: dict) -> dict:
 
     return position_data.get('Position', [0])[-1].get('Entries', {})
 
-def get_circuit_corners(meeting_data: dict) -> list:
+def get_circuit_corners(circuit: dict) -> list:
     """Get the circuit corners from the current session"""
 
-    circuit_key = int(meeting_data.get('Circuit', {}).get('Key', 0))
-    current_time = datetime.datetime.now(tz=datetime.timezone.utc)
-    circuit = get_circuit(year=current_time.year, circuit_key=circuit_key)
-
-    if current_session is None:
+    if circuit is None:
         return []
     
     circuit_corners = circuit.get('corners', [])
@@ -86,12 +87,8 @@ def get_circuit_corners(meeting_data: dict) -> list:
 
     return corners
 
-def get_track_path(meeting_data: dict) -> list[tuple[float, float]]:
+def get_track_path(circuit: dict) -> list[tuple[float, float]]:
     """Get the track path from the multiview API (fastf1.mvapi)"""
-    
-    circuit_key = int(meeting_data.get('Circuit', {}).get('Key', 0))
-    current_time = datetime.datetime.now(tz=datetime.timezone.utc)
-    circuit = get_circuit(year=current_time.year, circuit_key=circuit_key)
 
     path = []
 
@@ -127,12 +124,16 @@ def get_driver_position(pos_data: dict, driver_raw_data: dict) -> list[dict]:
 def get_circuit_info(meeting_data: dict, pos_data: dict, driver_raw_data: dict) -> dict:
     """Get the current circuit info"""
 
+    circuit_key = int(meeting_data.get('Circuit', {}).get('Key', 0))
+    current_time = datetime.datetime.now(tz=datetime.timezone.utc)
+    circuit = get_circuit(year=current_time.year, circuit_key=circuit_key)
+
     circuit = {
         'trackName': meeting_data.get('Circuit', {}).get('ShortName', 'Unknown'),
-        'corners': get_circuit_corners(meeting_data),
-        'trackPath': get_track_path(meeting_data),
+        'corners': get_circuit_corners(circuit),
+        'trackPath': get_track_path(circuit),
         'driverPos': get_driver_position(pos_data, driver_raw_data),
-        'rotation': current_session.get_circuit_info().rotation,
+        'rotation': float(circuit.get('rotation', 0)),
     }
 
     return circuit
