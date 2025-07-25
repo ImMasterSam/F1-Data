@@ -1,6 +1,5 @@
 import ReactCountryFlag from "react-country-flag";
 import DashboardRow from "./DashComponent/DashboardRow";
-import Weather from "./DashComponent/DashHeader/Weather";
 import type { ConnectionState, dashData_type } from "../../Type/Dashtypes"
 import { Country } from "../../Lib/CountryCode";
 import TrackStatus from "./DashComponent/DashHeader/TrackStatus";
@@ -25,7 +24,7 @@ function DashboardHeader({ data }: dashHeader_Props) {
       <h2>{data.grandPrixName} - {data.session}</h2>
     </div>
     {data?.clock && <CountDown clock={data.clock}/>}
-    {data?.other && data.session == 'Race' && 'currentLap' in data.other && 'totalLaps' in data.other && (
+    {data?.other && 'currentLap' in data.other && 'totalLaps' in data.other && (
       <h3>{`Lap ${data.other.currentLap} / ${data.other.totalLaps}`}</h3>
     )}
     {data?.trackStatus && <TrackStatus trackStatus={data.trackStatus}/>}
@@ -42,7 +41,6 @@ function Dashboard({ data, connectionState }: dash_Props) {
 
   return <div className="dashboard">
     {data?.grandPrixName && <DashboardHeader data={data}/>}
-    {data?.weather && <Weather weather={data?.weather}/>}
     <div className="drivers-table">
       {data?.results ? data.results.map((result) => {
         return <DashboardRow result={result} intervalTop={intervalTop} handleGapTop={handleGapTop} key={result.driver.driverNumber}/>

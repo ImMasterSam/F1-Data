@@ -7,6 +7,7 @@ import Radio from "../Component/LiveTiming/Radio";
 import "../CSS/Page.css";
 import '../CSS/Dashboard.css'
 import '../CSS/DashInfo.css'
+import Weather from "../Component/LiveTiming/Weather";
 
 
 function LiveTimingPage() {
@@ -192,7 +193,10 @@ function LiveTimingPage() {
     ? <div className="dash-container">
       <Dashboard data={data} connectionState={connectionState} />
       <div className="dash-info">
-        {data.circuit && <Map circuit={data.circuit}/>}
+        <div className="map-weather">
+          {data.circuit && <Map circuit={data.circuit}/>}
+          {data?.weather && <Weather weather={data?.weather}/>}
+        </div>
         <div className='message-info'>
           {data.raceControlMessages && <RaceControl raceControlMessages={data.raceControlMessages} />}
           {data.teamRadio && <Radio teamRadio={data.teamRadio} />}
