@@ -13,7 +13,7 @@ function Weather({ weather }: Props) {
     <p>Rain: {weather.rainfall ? '✅' : '❌'}</p>
     <p>TrackTemp: {weather.trackTemp}°C</p>
     <p>WindDirection: {weather.windDirection}°</p>
-    <p>WindSpeed: {weather.windSpeed} km/h</p>
+    <p>WindSpeed: {weather.windSpeed.toFixed(2)} km/h</p>
   </div>
 }
 

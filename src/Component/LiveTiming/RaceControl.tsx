@@ -13,7 +13,7 @@ const get_bgColor = (mes: raceControlMessages_type) => {
     const flag = mes.Flag.toLowerCase()
     if (flag === 'green' || flag === 'clear')
       return '#194019'
-    else if (flag === 'yellow' || flag === 'doueble yellow')
+    else if (flag === 'yellow' || flag === 'double yellow')
       return '#404019'
     else if (flag === 'blue')
       return '#191940'

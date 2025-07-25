@@ -129,11 +129,14 @@
 }
 
 .tire-feild {
-    min-width: 6.5rem;
+    width: 6.5rem;
     padding: 0 15px;
     text-align: Left;
     display: flex;
     flex-direction: column;
+}
+
+.tire-feild > h4, p {
     text-overflow: ellipsis;
 }
 

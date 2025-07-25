@@ -208,7 +208,7 @@ def get_current_tire_info(driver_number: str, tire_raw_data: dict) -> dict:
 def get_gap_info(driver_timing_info: dict, session: str, session_part: str = '') -> dict:
     """Get the current gap info for a driver to the leader and the driver in front"""
 
-    if session == 'Qualifying':
+    if session == 'Qualifying' or session == 'Sprint Qualifying':
         # In qualifying, the gap info is in the stats
         driver_stats = driver_timing_info.get('Stats', {})[int(session_part) - 1]
 
@@ -370,6 +370,10 @@ def get_live_timing() -> dict:
     if session_type == 'Qualifying':
         # In qualifying, entries marks the number of drivers that are allowed to qualify
         entries = timing_raw_data.get('NoEntries', [])[int(session_part) % 3]
+        if res['session'] == 'Sprint Qualifying':
+            res['session'] += f' SQ{session_part}'
+        else:
+            res['session'] += f' Q{session_part}'
     else:
         entries = 999
     
@@ -436,7 +440,7 @@ if __name__ == '__main__':
         try:
             # res = get_live_timing()
             # print(*res['results'], sep='\n')
-            print(wss.data_global.get("SessionInfo"))
+            print(wss.data_global.get("Heartbeat"))
             # raw_car_data = wss.data_global.get('Position.z')
             # compressed_bytes = base64.b64decode(raw_car_data)
             # decompressed_data = zlib.decompress(compressed_bytes, -zlib.MAX_WBITS)

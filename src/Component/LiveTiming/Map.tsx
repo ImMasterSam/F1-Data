@@ -45,7 +45,7 @@ function Graph({ corners, trackPath, driverPos, rotation }: Graph_Props) {
   const norm = (x: number, y: number): [number, number] => {
     const originalWidth = maxX - minX;
     const originalHeight = maxY - minY;
-    const targetWidth = 800 - 2 * padding;
+    const targetWidth = 600 - 2 * padding;
     const targetHeight = 400 - 2 * padding;
 
     const scale = Math.min(targetWidth / originalWidth, targetHeight / originalHeight);
@@ -73,7 +73,7 @@ function Graph({ corners, trackPath, driverPos, rotation }: Graph_Props) {
     return [newX, newY]
   }
 
-  return <svg width={800} height={400} >
+  return <svg width={600} height={400} >
     <path
       d={points}
       fill="none"
