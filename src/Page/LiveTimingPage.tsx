@@ -203,7 +203,10 @@ function LiveTimingPage() {
         </div>
       </div>
     </div>
-    : <h2>Connecting to Server ...</h2>}
+    : <div className="connecting">
+        <h2>Connecting to Server ...</h2>
+        <p>( Attempts: {connectionState.reconnectAttempts} / 20 )</p>
+      </div>}
   </div>
 }
 
