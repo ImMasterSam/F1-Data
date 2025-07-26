@@ -156,7 +156,7 @@ def get_drspit_info(driver_timing_info: dict, car_info: dict) -> dict:
     # DRS
     DRS_ENABLED = {10, 12, 14}
 
-    drs_raw = car_info.get('Channels', {}).get('45', 0)
+    drs_raw = car_info.get('45', 0)
     if drs_raw > 9:
         drs_status = 2  # DRS is enabled
     elif drs_raw == 8:
