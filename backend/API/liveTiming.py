@@ -1,4 +1,4 @@
-import fastf1
+# import fastf1
 from fastf1.livetiming.data import LiveTimingData
 from fastf1.core import Session, Lap
 from fastf1.mvapi.api import get_circuit
@@ -433,14 +433,14 @@ if __name__ == '__main__':
     t = threading.Thread(target=wss.connect_wss, daemon=True)
     t.start()
 
-    fastf1.Cache.enable_cache('cache')
+    # fastf1.Cache.enable_cache('cache')
 
     while True:
         print("Getting live timing data...")
         try:
             # res = get_live_timing()
             # print(*res['results'], sep='\n')
-            print(wss.data_global.get("Heartbeat"))
+            print(wss.data_global.get(""))
             # raw_car_data = wss.data_global.get('Position.z')
             # compressed_bytes = base64.b64decode(raw_car_data)
             # decompressed_data = zlib.decompress(compressed_bytes, -zlib.MAX_WBITS)

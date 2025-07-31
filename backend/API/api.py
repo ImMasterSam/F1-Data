@@ -8,7 +8,7 @@ import time
 import threading
 import logging
 
-import fastf1
+# import fastf1
 
 from flask import Flask, Response
 from flask_cors import CORS
@@ -48,6 +48,7 @@ def check_wss():
 
     if not wss.wss_thread.is_alive():
         logging.warning('WebSocket thread is not alive, starting it now.')
+        wss.wss_thread = threading.Thread(target=wss.connect_wss, daemon=True)
         wss.wss_thread.start()
 
     if wss.ws_global is None:
@@ -85,8 +86,8 @@ if __name__ == '__main__':
     if not os.path.exists('cache'):
         os.makedirs('cache')
 
-    fastf1.set_log_level('ERROR')
-    fastf1.Cache.enable_cache('cache')
+    # fastf1.set_log_level('ERROR')
+    # fastf1.Cache.enable_cache('cache')
 
     wss.wss_thread.start()
 
