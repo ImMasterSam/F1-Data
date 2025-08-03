@@ -3,11 +3,15 @@ import urllib.parse
 import websocket
 import requests
 import threading
-from time import sleep
+import time
+import datetime
 
 ws_global: websocket.WebSocketApp = None
-data_global = None
-driver_global = None
+data_global: dict = None
+driver_global: dict = None
+last_driver_received: datetime.datetime = None
+
+SUBS_TITLE = ["TimingData", "TimingStats", "TimingAppData", "CarData.z", "Position.z", "WeatherData", "TrackStatus", "ExtrapolatedClock", "RaceControlMessages", "TeamRadio", "LapCount", "SessionInfo"]
 
 def negotiate(hub):
 
@@ -44,17 +48,20 @@ def connect_wss():
 
     def on_open(ws: websocket.WebSocketApp):
         print("WebSocket opened")
+        subscribe_titles = SUBS_TITLE.copy()
+        subscribe_titles.append("DriverList")
+        subscribe_titles.append("Heartbeat")
         subscribe_msg = {
             "H": "Streaming",
             "M": "Subscribe",
-            "A": [["Heartbeat", "DriverList", "TimingData", "TimingStats", "TimingAppData", "CarData.z", "Position.z", "WeatherData", "TrackStatus", "ExtrapolatedClock", "RaceControlMessages", "TeamRadio", "LapCount", "SessionInfo"]],
+            "A": [subscribe_titles],
             "I": 1
         }
         ws.send(json.dumps(subscribe_msg))
         
 
     def on_message(ws: websocket.WebSocketApp, message):
-        global data_global, driver_global
+        global data_global, driver_global, last_driver_received
 
         # print("received Message: ", message[:100], "...")  # Print first 100 characters for brevity
         msg_json = json.loads(message)
@@ -62,16 +69,19 @@ def connect_wss():
 
             data_global = msg_json.get('R')
             if data_global.get('DriverList'):
+                last_driver_received = datetime.datetime.now()
                 driver_global = data_global.get('DriverList')
             else:
-                if driver_global is not None:
+                if (data_global is not None) and (driver_global is not None):
                     data_global['DriverList'] = driver_global
                 else:
                     raise Exception("DriverList not found in data_global and driver_global is None")
             # print("Data received:", data_global)
 
-            subscribe_titles = ["TimingData", "TimingStats", "TimingAppData", "CarData.z", "Position.z", "WeatherData", "TrackStatus", "ExtrapolatedClock", "RaceControlMessages", "TeamRadio", "LapCount", "SessionInfo"]
+            subscribe_titles = SUBS_TITLE.copy()
             if driver_global is None:
+                subscribe_titles.append("DriverList")
+            elif last_driver_received is None or (datetime.datetime.now() - last_driver_received).total_seconds > 300:
                 subscribe_titles.append("DriverList")
 
             subscribe_msg = {
@@ -98,7 +108,6 @@ def connect_wss():
         on_close=on_close
     )
     ws_global = ws
-    ws.run_forever(ping_interval=0.5)
     ws.run_forever(ping_interval=0.5)
 
 wss_thread = threading.Thread(target=connect_wss, daemon=True)
