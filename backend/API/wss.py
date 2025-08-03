@@ -81,7 +81,8 @@ def connect_wss():
             subscribe_titles = SUBS_TITLE.copy()
             if driver_global is None:
                 subscribe_titles.append("DriverList")
-            elif last_driver_received is None or (datetime.datetime.now() - last_driver_received).total_seconds > 300:
+            elif last_driver_received is None or (datetime.datetime.now() - last_driver_received).total_seconds() > 300:
+                print("DriverList is None or not received in the last 5 minutes, resubscribing")
                 subscribe_titles.append("DriverList")
 
             subscribe_msg = {
