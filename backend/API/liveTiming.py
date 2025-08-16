@@ -337,10 +337,10 @@ def get_live_timing() -> dict:
         tire_raw_data: dict = wss.data_global['TimingAppData']
         weather_raw_data: dict = wss.data_global['WeatherData']
         trackStatus_raw_data: dict = wss.data_global['TrackStatus']
-        clock_raw_data: dict = wss.data_global['ExtrapolatedClock']
+        clock_raw_data: dict = wss.data_global.get('ExtrapolatedClock', {})
         session_raw_data: dict = wss.data_global['SessionInfo']
-        car_raw_data: dict = wss.data_global['CarData.z']
-        pos_raw_data: dict = wss.data_global['Position.z']
+        car_raw_data: dict = wss.data_global.get('CarData.z', {})
+        pos_raw_data: dict = wss.data_global.get('Position.z', {})
         raceControlMessages_raw_data: dict = wss.data_global.get('RaceControlMessages', {})
         radio_raw_data: dict = wss.data_global.get('TeamRadio', {})
     except Exception as e:
