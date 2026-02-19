@@ -90,5 +90,6 @@ if __name__ == '__main__':
     # fastf1.Cache.enable_cache('cache')
 
     wss.wss_thread.start()
+    wss.monitor_thread.start()
 
     app.run(debug=True)
