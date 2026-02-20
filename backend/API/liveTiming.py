@@ -440,7 +440,9 @@ if __name__ == '__main__':
         try:
             # res = get_live_timing()
             # print(*res['results'], sep='\n')
-            print(wss.data_global.get(""))
+            json.dump(wss.data_global, open('saved_data 2026.txt', 'w'), indent=4)
+            if wss.data_global:
+                exit(0)
             # raw_car_data = wss.data_global.get('Position.z')
             # compressed_bytes = base64.b64decode(raw_car_data)
             # decompressed_data = zlib.decompress(compressed_bytes, -zlib.MAX_WBITS)

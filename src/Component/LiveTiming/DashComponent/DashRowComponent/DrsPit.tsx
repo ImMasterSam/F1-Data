@@ -8,9 +8,9 @@ const get_DrsPit_text = (drspit: drspitInfo_type) => {
     if (drspit.pitStatus === 1)
         return 'PIT'
     else if (drspit.pitStatus === 2)
-        return 'PIT EXIT'
+        return 'PIT OUT'
     else
-        return 'DRS'
+        return 'OVT'
 }
 
 const get_label = (drspit: drspitInfo_type) => {

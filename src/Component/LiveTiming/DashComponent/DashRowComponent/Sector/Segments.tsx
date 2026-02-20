@@ -3,11 +3,12 @@ type Props = {
 }
 
 const segment_color: {[status: number]: string} = {
-     0: '#222222',
-  2051: '#7a22fe',
-  2049: '#01a656',
-  2048: '#ffb900',
-  2064: '#2b7fff'
+     0: '#222222', // Not yet
+  2051: '#7a22fe', // Overall Fastest
+  2049: '#01a656', // Personal Fastest
+  2048: '#ffb900', // Not Fastest
+  2052: '#aa0000', // Run Off
+  2064: '#2b7fff', // In pit
 }
 
 function Segment({ segments }: Props) {
