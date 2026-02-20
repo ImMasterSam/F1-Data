@@ -200,7 +200,11 @@ def get_current_tire_info(driver_number: str, tire_raw_data: dict) -> dict:
     except:
         last_stint = {}
 
-    tire_info = { 'compound': last_stint.get('Compound', 'UNKNOWN'),
+    compound = last_stint.get('Compound', 'UNKNOWN')
+    if compound not in {'SOFT', 'MEDIUM', 'HARD', 'INTERMEDIATE', 'WET'}:
+        compound = 'UNKNOWN'
+
+    tire_info = { 'compound': compound,
                   'laps': int(last_stint.get('TotalLaps', '0'))}
     
     return tire_info
