@@ -20,7 +20,7 @@ function LiveTimingPage() {
     error: null
   })
   const eventSourceRef = useRef<EventSource | null>(null)
-  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const maxReconnectAttempts = 20
   const baseRetryDelay = 1000 // 1秒
