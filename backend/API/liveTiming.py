@@ -97,6 +97,45 @@ def get_track_path(circuit: dict) -> list[tuple[float, float]]:
 
     return path
 
+def get_driver_segment_position(track_path: list[tuple[float, float]], drivers_raw_data: dict, timing_raw_data: dict) -> list[dict]:
+    """Get the driver position base on the segment data"""
+
+    driver_positions = []
+
+    for driver_number in drivers_raw_data.keys():
+
+        if not driver_number.isdigit():
+            continue
+
+        # Get driver lap segment info
+        driver_info = get_driver_info(driver_number, drivers_raw_data)
+        driver_timing_info = timing_raw_data.get('Lines', {}).get(driver_number, {})
+        driver_segments = []
+        for sector in driver_timing_info.get('Sectors', []):
+            driver_segments.extend(sector.get('Segments', []))
+
+        # look for the last segment with status > 0
+        last_segment = None
+        for segment_id in range(len(driver_segments) - 1, -1, -1):
+            if driver_segments[segment_id].get('Status', 0) > 0:
+                last_segment = segment_id
+                break
+
+        segment_position = track_path[last_segment * (len(track_path) // len(driver_segments))] if last_segment is not None else track_path[0]
+        position = {
+            'x': float(segment_position[0]),
+            'y': float(segment_position[1]),
+        }
+
+        driver_position = {
+            'driver': driver_info,
+            'position': position,
+        }
+
+        driver_positions.append(driver_position)
+    
+    return driver_positions
+
 def get_driver_position(pos_data: dict, driver_raw_data: dict) -> list[dict]:
     """Get the driver position from the position data and driver raw data"""
 
@@ -121,18 +160,21 @@ def get_driver_position(pos_data: dict, driver_raw_data: dict) -> list[dict]:
 
     return driver_positions
 
-def get_circuit_info(meeting_data: dict, pos_data: dict, driver_raw_data: dict) -> dict:
+def get_circuit_info(meeting_data: dict, pos_data: dict, drivers_raw_data: dict, timing_raw_data: dict) -> dict:
     """Get the current circuit info"""
 
     circuit_key = int(meeting_data.get('Circuit', {}).get('Key', 0))
     current_time = datetime.datetime.now(tz=datetime.timezone.utc)
     circuit = get_circuit(year=current_time.year, circuit_key=circuit_key)
 
+    track_path = get_track_path(circuit)
+    driver_position = get_driver_segment_position(track_path, drivers_raw_data, timing_raw_data)
+
     circuit = {
         'trackName': meeting_data.get('Circuit', {}).get('ShortName', 'Unknown'),
         'corners': get_circuit_corners(circuit),
-        'trackPath': get_track_path(circuit),
-        'driverPos': get_driver_position(pos_data, driver_raw_data),
+        'trackPath': track_path,
+        'driverPos': driver_position,
         'rotation': float(circuit.get('rotation', 0)),
     }
 
@@ -367,7 +409,7 @@ def get_live_timing() -> dict:
         print("Current session updated successfully.")
     
     position_data = decompressed_posData(pos_raw_data)
-    res['circuit'] = get_circuit_info(meeting_data, position_data, drivers_raw_data)
+    res['circuit'] = get_circuit_info(meeting_data, position_data, drivers_raw_data, timing_raw_data)
     
     # Qualifying handling
     session_part = timing_raw_data.get('SessionPart', '')
@@ -441,19 +483,20 @@ if __name__ == '__main__':
 
     while True:
         print("Getting live timing data...")
-        try:
+        # try:
             # res = get_live_timing()
             # print(*res['results'], sep='\n')
-            json.dump(wss.data_global, open('saved_data 2026.txt', 'w'), indent=4)
-            if wss.data_global:
-                exit(0)
+        current_data = get_live_timing()
+        json.dump(current_data, open('saved_data 2026.txt', 'w'), indent=4)
+        if current_data:
+            exit(0)
             # raw_car_data = wss.data_global.get('Position.z')
             # compressed_bytes = base64.b64decode(raw_car_data)
             # decompressed_data = zlib.decompress(compressed_bytes, -zlib.MAX_WBITS)
             # car_data = json.loads(decompressed_data.decode('utf-8'))
             # print(car_data)
-        except Exception as e:
-            print(f"Error getting live timing data: {e}")
+        # except Exception as e:
+        #     print(f"Error getting live timing data: {e}")
             
         time.sleep(3)
 

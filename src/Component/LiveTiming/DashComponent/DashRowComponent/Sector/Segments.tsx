@@ -7,7 +7,7 @@ const segment_color: {[status: number]: string} = {
   2051: '#7a22fe', // Overall Fastest
   2049: '#01a656', // Personal Fastest
   2048: '#ffb900', // Not Fastest
-  2052: '#aa0000', // Run Off
+  2052: '#aa0000', // Stop
   2064: '#2b7fff', // In pit
 }
 
