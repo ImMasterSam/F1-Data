@@ -32,7 +32,7 @@ function Schedule() {
   const [errMessage, setErrMessage] = useState<string>('')
 
   useEffect(() => {
-    getScheduleList(2025).then((data) => {
+    getScheduleList(new Date().getFullYear()).then((data) => {
       setSchedulelist(data)
     }).catch((error) => {setErrMessage(error)})
   }, [])
