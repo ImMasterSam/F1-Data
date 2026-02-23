@@ -27,15 +27,19 @@ async function getScheduleList(year: number): Promise<Array<race_type>> {
   return scheduleList
 }
 
-function Schedule() {
+type Props = {
+  year: number
+}
+
+function Schedule({year}: Props) {
   const [scheduleList, setSchedulelist] = useState<Array<race_type>>([])
   const [errMessage, setErrMessage] = useState<string>('')
 
   useEffect(() => {
-    getScheduleList(new Date().getFullYear()).then((data) => {
+    getScheduleList(year).then((data) => {
       setSchedulelist(data)
     }).catch((error) => {setErrMessage(error)})
-  }, [])
+  }, [year])
 
   return (
     <div className="race-container">

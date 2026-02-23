@@ -6,8 +6,21 @@
     align-items: center;
 }
 
-.schedule-header > h3 {
-    padding-right: 10px;
+.schedule-header-title{
+    width: 50%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+}
+
+.schedule-header-title > p, select {
+    color: white;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-right: 10px;
+    background-color: black;
+    border: none;
 }
 
 .race-container {

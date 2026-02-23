@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react"
 import { getTimeString } from "../../Lib/Schedule/TimeHandler"
 
-function ScheduleHeader() {
+type Props = {
+  setSelectedYear: Function
+}
+
+function ScheduleHeader({setSelectedYear}: Props) {
 
   const [clock, setClock] = useState<string>(getTimeString())
 
@@ -13,7 +17,13 @@ function ScheduleHeader() {
   }, [])
 
   return <div className="schedule-header">
-    <h2 style={{padding: '15px 10px'}}>2025 F1 Race Calender</h2>
+    <div className="schedule-header-title">
+      <select onChange={(e) => setSelectedYear(e.target.value)}>
+        <option value="2026">2026</option>
+        <option value="2025">2025</option>
+      </select>
+      <p>F1 Race Calender</p>
+    </div>
     <h3>{clock}</h3>
   </div>
 }
