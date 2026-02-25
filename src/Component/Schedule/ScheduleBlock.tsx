@@ -19,7 +19,7 @@ function ScheduleBlock({race}: Props) {
       <p>{race.Circuit.circuitName}</p>
     </div>
     <div className="race-date">
-      <p>{getDateRange(race.FirstPractice.date, race.date)}</p>
+      <p>{getDateRange(race.date)}</p>
     </div>
   </div>
 }

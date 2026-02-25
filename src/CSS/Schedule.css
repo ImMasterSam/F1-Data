@@ -4,6 +4,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    padding: 0px 10px;
 }
 
 .schedule-header-title{
@@ -11,10 +12,10 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: 10px;
+    padding: 10px 0px;
 }
 
-.schedule-header-title > p, select {
+.schedule-header-title > p {
     color: white;
     font-size: 2rem;
     font-weight: bold;
@@ -23,11 +24,31 @@
     border: none;
 }
 
+.schedule-header-title > select {
+    color: white;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-right: 10px;
+    background-color: black;
+    border: none;
+    cursor: pointer;
+}
+.schedule-header-title > select:focus {
+    background-color: #202020; /* 聚焦時稍微變亮 */
+    outline: 2px solid darkred; /* 使用 F1 紅色作為聚焦框 */
+    border-radius: 8px;
+}
+.schedule-header-title > select option {
+    background-color: #202020;
+    color: white;
+    font-size: 1rem; /* 選項字體可以稍微小一點 */
+}
+
 .race-container {
     width: 100%;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 16px;
+    gap: 15px 5px;
 }
 
 .race-block {
@@ -48,7 +69,6 @@
 }
 
 .race-block:hover h3 {
-    font-size: 120%;
     text-decoration: underline;
     transition: all 0.2s ease;
 }
