@@ -44,7 +44,45 @@
     font-size: 1rem; /* 選項字體可以稍微小一點 */
 }
 
-.race-container {
+.schedule-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 0px;
+}
+
+.schedule-panel {
+    width: 100%;
+    height: 500px;
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    padding: 20px 0px;
+}
+
+.schedule-raceinfo {
+    width: 50%;
+    height: 100%;
+    background-color: #202020;
+    border-radius: 10px;
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.track-map {
+    max-width: 50%;
+    height: 100%;
+    background-color: #202020;
+    border-radius: 10px;
+    margin: 10px;
+    display: flex;
+    position: relative;
+    
+}
+
+.schedule-grid {
     width: 100%;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
