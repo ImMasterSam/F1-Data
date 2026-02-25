@@ -5,10 +5,11 @@ import { getDateRange } from "../../Lib/Schedule/TimeHandler";
 
 type Props = {
     race: race_type;
+    setSelectedTrack: Function;
 }
 
-function ScheduleBlock({race}: Props) {
-  return <div className={`race-block ${race.status}`} onClick={() => {window.open(race.url, '_blank')}}>
+function ScheduleBlock({race, setSelectedTrack}: Props) {
+  return <div className={`race-block ${race.status}`} onClick={() => {setSelectedTrack(race.round-1)}}>
     <div className="race-info">
       <div className="race-header">
         <ReactCountryFlag countryCode={Country[race.Circuit.Location.country]} 

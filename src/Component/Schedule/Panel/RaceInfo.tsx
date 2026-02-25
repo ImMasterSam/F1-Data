@@ -7,7 +7,7 @@ type Props = {
 function RaceInfo({race}: Props) {
   return (
     <div className="schedule-raceinfo">
-      <h3>{race.raceName}</h3>
+      <h2>{race.raceName}</h2>
     </div>
   )
 }

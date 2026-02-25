@@ -15,7 +15,9 @@ function MapController({ center }: Controller_Props) {
   const map = useMap();
   
   useEffect(() => {
-    map.setView(center, 15); // 這裡可以設定縮放層級，例如 14 或 15
+    map.flyTo(center, 14, {
+      duration: 3,
+    }); // 這裡可以設定縮放層級，例如 14 或 15
     console.log(center)
   }, [center, map]); // 當 center 改變時觸發
 
@@ -27,7 +29,7 @@ function TrackMap({race}: Props) {
   const position: [number, number] = [Number(race.Circuit.Location.lat), Number(race.Circuit.Location.long)]
 
   return (
-    <MapContainer center={position} zoom={8} className="track-map">
+    <MapContainer center={position} zoom={14} style={{ minHeight: "100%", minWidth: "50%", flex: 1}} className="track-map">
       
       {/* 底圖圖層 */}
       <TileLayer

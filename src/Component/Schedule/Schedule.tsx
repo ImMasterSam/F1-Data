@@ -11,7 +11,12 @@ type Props = {
 
 function Schedule({year}: Props) {
   const [scheduleList, setSchedulelist] = useState<Array<race_type>>([])
+  const [selectedTrack, setSelectedTrack] = useState<number>(0)
   const [errMessage, setErrMessage] = useState<string>('')
+
+  const handleSelectedTrack = (idx: number) => {
+    setSelectedTrack(idx)
+  }
 
   useEffect(() => {
     fetchScheduleList(year).then((data) => {
@@ -21,12 +26,12 @@ function Schedule({year}: Props) {
 
   return (
     <div className="schedule-container">
-      {scheduleList ? <SchedulePanel race={scheduleList[0]}/> : <p>Loading</p>}
+      {scheduleList ? <SchedulePanel race={scheduleList[selectedTrack]}/> : <p>Loading</p>}
       <div className="schedule-grid">
         {errMessage ? <h3>{errMessage}</h3>
         : scheduleList.map((race) => { 
           return race 
-          ? <ScheduleBlock race={race} key={race.round}/> 
+          ? <ScheduleBlock race={race} key={race.round} setSelectedTrack={handleSelectedTrack}/> 
           : <p>Loading ...</p>})}
       </div>
 
