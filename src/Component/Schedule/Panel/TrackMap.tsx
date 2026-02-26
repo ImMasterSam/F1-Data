@@ -3,6 +3,19 @@ import type { race_type } from "../../../Type/RaceTypes";
 import { useEffect } from "react";
 import "leaflet/dist/leaflet.css"; // 必須引入這行 CSS 才能正常顯示地圖
 
+import L from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+// 設定預設 Icon (React Leaflet 常見問題修復)
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
 
 type Props = {
     race: race_type;
