@@ -1,7 +1,8 @@
-import { MapContainer, TileLayer, useMap } from "react-leaflet";
+import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import type { race_type } from "../../../Type/RaceTypes";
 import { useEffect } from "react";
 import "leaflet/dist/leaflet.css"; // 1. 必須引入這行 CSS 才能正常顯示地圖
+
 
 type Props = {
     race: race_type;
@@ -35,6 +36,15 @@ function TrackMap({race}: Props) {
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+
+      <Marker position={position}>
+        <Popup>
+          <div style={{ textAlign: 'center' }}>
+            <h3 style={{ margin: '5px 0' }}>{race.Circuit.circuitName}</h3>
+            <p style={{ margin: 0 }}>{race.Circuit.Location.locality}, {race.Circuit.Location.country}</p>
+          </div>
+        </Popup>
+      </Marker>
 
       <MapController center={position}/>
     </MapContainer>

@@ -49,6 +49,21 @@ h2 {
     align-items: left;
 }
 
+
+
+/* Scroll Bar */
+*::-webkit-scrollbar {
+  width: 5px;
+  background: #222;
+}
+*::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 2px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 @font-face {
     font-family: 'F1';
     src: url('/Fonts/Formula1-Bold_web_0.ttf') format('truetype');

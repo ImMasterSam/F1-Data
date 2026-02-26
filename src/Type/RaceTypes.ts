@@ -25,10 +25,10 @@ export type race_normal_type = {
     Circuit: circuit_type;
     date: string;
     time: string;
-    FirstPractice: datetime_type;
-    SecondPractice: datetime_type;
-    ThirdPractice: datetime_type;
-    Qualifying: datetime_type;
+    FirstPractice: datetime_type | null;
+    SecondPractice: datetime_type | null;
+    ThirdPractice: datetime_type | null;
+    Qualifying: datetime_type | null;
     status: 'finish' | 'next' | 'racing' | 'yetStart';
 }
 

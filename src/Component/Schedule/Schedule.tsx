@@ -22,6 +22,7 @@ function Schedule({year}: Props) {
     fetchScheduleList(year).then((data) => {
       setSchedulelist(data)
     }).catch((error) => {setErrMessage(error)})
+    handleSelectedTrack(0)
   }, [year])
 
   return (
