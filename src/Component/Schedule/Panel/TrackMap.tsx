@@ -1,7 +1,7 @@
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import type { race_type } from "../../../Type/RaceTypes";
 import { useEffect } from "react";
-import "leaflet/dist/leaflet.css"; // 1. 必須引入這行 CSS 才能正常顯示地圖
+import "leaflet/dist/leaflet.css"; // 必須引入這行 CSS 才能正常顯示地圖
 
 
 type Props = {
@@ -16,10 +16,15 @@ function MapController({ center }: Controller_Props) {
   const map = useMap();
   
   useEffect(() => {
+    const currentCenter = map.getCenter();
+    const dist = currentCenter.distanceTo([center[0], center[1]])
+    if (dist > 100) {
     map.flyTo(center, 14, {
       duration: 3,
     }); // 這裡可以設定縮放層級，例如 14 或 15
-    console.log(center)
+    console.log("Flying to:", center)
+    }
+
   }, [center, map]); // 當 center 改變時觸發
 
   return null;

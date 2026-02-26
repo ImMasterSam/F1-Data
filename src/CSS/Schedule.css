@@ -32,11 +32,18 @@
     background-color: black;
     border: none;
     cursor: pointer;
+    border: none;
+    border-bottom: 3px solid transparent; 
+}
+.schedule-header-title > select:hover {
+    border-bottom-color: #e10600; /* F1 紅色 */
 }
 .schedule-header-title > select:focus {
-    background-color: #202020; /* 聚焦時稍微變亮 */
-    outline: 2px solid darkred; /* 使用 F1 紅色作為聚焦框 */
-    border-radius: 8px;
+    background-color: #202020; 
+    /* 聚焦時也保持紅色底線，並移除原本建議的 outline 以求風格一致 */
+    outline: none; 
+    border-bottom-color: #e10600;
+    border-radius: 8px 8px 0 0; /* 上方圓角，下方直角接底線 */
 }
 .schedule-header-title > select option {
     background-color: #202020;
@@ -52,7 +59,7 @@
 
 .schedule-panel {
     width: 100%;
-    height: 500px;
+    min-height: 400px;
     display: flex;
     flex-direction: row;
     position: relative;
@@ -60,14 +67,134 @@
 }
 
 .schedule-raceinfo {
+    /* 基礎佈局 */
     width: 50%;
     height: 100%;
     background-color: #202020;
     border-radius: 10px;
-    margin: 10px;
+    margin: 10px; /* 改用 margin-right */
+    padding: 25px; /* 增加內距 */
+    color: white;
     display: flex;
     flex-direction: column;
-    padding: 10px;
+    overflow-y: auto; /* 若內容太多可捲動 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* 標題區塊 */
+.info-header {
+    margin-bottom: 5px;
+}
+
+.race-round {
+    color: #e10600; /* F1 經典紅 */
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.race-title {
+    width: fit-content;
+    font-size: 2rem;
+    font-weight: 900;
+    margin: 5px 0 10px 0;
+    line-height: 1.1;
+}
+.race-title:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.location-name {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #ccc;
+    display: flex;
+    margin-bottom: 5px;
+}
+
+.divider {
+    border: 0;
+    border-top: 1px solid #444;
+    margin: 10px 0;
+    width: 100%;
+}
+
+/* --- 賽程時間表 (Focus) --- */
+.timetable-title {
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+.session-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* 每個時間列的間距 */
+}
+
+/* 單一賽程列 (Row) */
+.session-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: #2a2a2a; /* 比背景稍亮 */
+    border-radius: 6px;
+    border-left: 4px solid transparent; /* 預留左側狀態條 */
+    transition: transform 0.2s;
+}
+
+.session-row:hover {
+    background-color: #333;
+}
+
+.session-name {
+    font-weight: 600;
+    color: #eee;
+}
+
+/* 時間字體，使用等寬字體讓數字對齊 */
+.session-time {
+    letter-spacing: 1.5px;
+    font-weight: bold;
+    color: white;
+    background-color: rgba(0,0,0,0.3);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+/* --- 狀態變化 (State Modifiers) --- */
+
+/* 未來/即將到來的賽程 */
+.session-row.upcoming {
+    border-left-color: #e10600; /* 紅色邊條 */
+}
+
+/* 已經過去的賽程 */
+.session-row.past {
+    border-left-color: #555; /* 灰色邊條 */
+    opacity: 0.6; /* 整體變淡 */
+}
+.session-row.past .session-name {
+    text-decoration: line-through; /* 刪除線 (可選) */
+}
+
+.session-row:last-child {
+    background: linear-gradient(90deg, rgba(225, 6, 0, 0.15) 0%, rgba(42, 42, 42, 1) 100%);
+    border-left-color: #e10600;
+    border-left-width: 6px; /* 更粗的邊條 */
+}
+
+.session-row:last-child .session-name {
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .track-map {
