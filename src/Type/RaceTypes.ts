@@ -17,7 +17,7 @@ export type circuit_type = {
     Location: location_type;
 }
 
-export type race_normal_type = {
+export type race_type = {
     season: number;
     round: number;
     url: string;
@@ -25,27 +25,30 @@ export type race_normal_type = {
     Circuit: circuit_type;
     date: string;
     time: string;
-    FirstPractice: datetime_type;
-    SecondPractice: datetime_type;
-    ThirdPractice: datetime_type;
-    Qualifying: datetime_type;
+    FirstPractice: datetime_type | null;
+    SecondPractice: datetime_type | null;
+    ThirdPractice: datetime_type | null;
+    Sprint: datetime_type | null;
+    SprintQualifying: datetime_type | null;
+    SprintShootout: datetime_type | null;
+    Qualifying: datetime_type | null;
     status: 'finish' | 'next' | 'racing' | 'yetStart';
 }
 
-export type race_sprint_type = {
-    season: number;
-    round: number;
-    url: string;
-    raceName: string;
-    Circuit: circuit_type;
-    date: string;
-    time: string;
-    FirstPractice: datetime_type;
-    SprintQualifying: datetime_type;
-    Sprint: datetime_type;
-    Qualifying: datetime_type;
-    status: 'finish' | 'next' | 'racing' | 'yetStart';
-}
+// export type race_sprint_type = {
+//     season: number;
+//     round: number;
+//     url: string;
+//     raceName: string;
+//     Circuit: circuit_type;
+//     date: string;
+//     time: string;
+//     FirstPractice: datetime_type;
+//     SprintQualifying: datetime_type;
+//     Sprint: datetime_type;
+//     Qualifying: datetime_type;
+//     status: 'finish' | 'next' | 'racing' | 'yetStart';
+// }
 
-export type race_type = race_normal_type | race_sprint_type
+// export type race_type = race_normal_type | race_sprint_type
 

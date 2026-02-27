@@ -1,5 +1,6 @@
 import type { race_type } from "../../Type/RaceTypes";
 
+
 export const setRaceStatus = (scheduleList: race_type[]) => {
 
   const currentTime = new Date()
@@ -10,7 +11,10 @@ export const setRaceStatus = (scheduleList: race_type[]) => {
     const raceTime = new Date(race.date + ' ' + race.time)
 
     if (raceTime < currentTime)
-      race = {...race, status: 'finish'}
+      if (raceTime.getFullYear() != currentTime.getFullYear())
+        race = {...race, status: 'yetStart'}
+      else
+        race = {...race, status: 'finish'}
     else {
       if (nextRace){
         race = {...race, status: 'next'}

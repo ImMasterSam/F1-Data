@@ -2,48 +2,40 @@ import { useState, useEffect } from "react";
 import type { race_type } from "../../Type/RaceTypes";
 import ScheduleBlock from "./ScheduleBlock";
 import '../../CSS/Schedule.css'
-import { setRaceStatus } from "../../Lib/Schedule/ScheduleHandler";
+import { fetchScheduleList } from "../../Lib/Fetch";
+import SchedulePanel from "./SchedulePanel";
 
-const requestOption = {
-    method: 'GET',
-    redirect: "follow" as RequestRedirect
-} 
-
-async function getScheduleList(year: number): Promise<Array<race_type>> {
-  
-  const srcURL = `https://api.jolpi.ca/ergast/f1/${year}/races/`
-  const response = await fetch(srcURL, requestOption);
-
-  if (!response.ok){
-    throw new Error(`Error! status: ${response.status}`)
-  }
-
-  const jsonContent = await response.json()
-  let scheduleList: Array<any> = jsonContent.MRData.RaceTable.Races
-  console.log(scheduleList)
-
-  scheduleList = setRaceStatus(scheduleList)
-
-  return scheduleList
+type Props = {
+  year: number
 }
 
-function Schedule() {
+function Schedule({year}: Props) {
   const [scheduleList, setSchedulelist] = useState<Array<race_type>>([])
+  const [selectedTrack, setSelectedTrack] = useState<number>(0)
   const [errMessage, setErrMessage] = useState<string>('')
 
+  const handleSelectedTrack = (idx: number) => {
+    setSelectedTrack(idx)
+  }
+
   useEffect(() => {
-    getScheduleList(new Date().getFullYear()).then((data) => {
+    fetchScheduleList(year).then((data) => {
       setSchedulelist(data)
     }).catch((error) => {setErrMessage(error)})
-  }, [])
+    handleSelectedTrack(0)
+  }, [year])
 
   return (
-    <div className="race-container">
-      {errMessage ? <h3>{errMessage}</h3>
-      : scheduleList.map((race) => { 
-        return race 
-        ? <ScheduleBlock race={race} key={race.round}/> 
-        : <p>Loading ...</p>})}
+    <div className="schedule-container">
+      {scheduleList ? <SchedulePanel race={scheduleList[selectedTrack]}/> : <p>Loading</p>}
+      <div className="schedule-grid">
+        {errMessage ? <h3>{errMessage}</h3>
+        : scheduleList.map((race) => { 
+          return race 
+          ? <ScheduleBlock race={race} key={race.round} setSelectedTrack={handleSelectedTrack}/> 
+          : <p>Loading ...</p>})}
+      </div>
+
     </div>
   )
 }
