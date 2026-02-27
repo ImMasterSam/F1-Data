@@ -73,7 +73,7 @@ function Graph({ corners, trackPath, driverPos, rotation }: Graph_Props) {
     return [newX, newY]
   }
 
-  return <svg width={600} height={400} >
+  return <svg viewBox="0 0 600 400" style={{ width: '100%', height: '100%'}}>
     <path
       d={points}
       fill="none"

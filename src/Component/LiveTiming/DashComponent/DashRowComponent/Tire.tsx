@@ -15,10 +15,18 @@ const tire_color: {[compound: string]: string} = {
 
 const tire_name = (compound: string) => {
   switch (compound.toUpperCase()) {
+    case 'SOFT':
+      return '(S)'
+    case 'MEDIUM':
+      return '(M)'
+    case 'HARD':
+      return '(H)'
     case 'INTERMEDIATE':
-      return 'INTER'
+      return '(I)'
+    case 'WET':
+      return '(W)'
     default:
-      return compound.toUpperCase()
+      return '(?)'
   }
 }
 

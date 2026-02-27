@@ -20,7 +20,7 @@
 }
 
 .dashboard {
-  width: fit-content;
+  flex: 0 0 auto;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -50,13 +50,19 @@
   padding: 0 20px;
 }
 
+.grandPrix-title > h2 {
+  width: fit-content;
+  display: flex;
+  padding: 0 20px;
+}
+
 .drivers-table {
   width: 100%;
   flex: 1 1 0;
   display: grid;
   grid-auto-rows: 1fr;
   align-items: stretch;
-  overflow: auto;
+  overflow-y: scroll;
 }
 
 
@@ -127,21 +133,30 @@
 }
 
 .tire-feild {
-  width: 6.5rem;
-  padding: 0 15px;
+  min-width: 6.5rem;
+  padding-left: 10px;
   text-align: Left;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
 }
-
-.tire-feild > h4,
-p {
-  text-overflow: ellipsis;
+.tire-feild > h4 {
+  font-family: monospace;
+  font-weight: 1000;
+  line-height: 1;
+  font-size: 1.3rem;
+  width: 1.5rem;
+  margin-right: 8px;
+}.tire-feild > p {
+  white-space: nowrap;
+  margin: 0;
+  line-height: normal;
 }
 
 .gap-feild {
   width: 6rem;
-  padding: 0 15px;
+  padding-left: 10px;
   text-align: Left;
   display: flex;
   flex-direction: column;
@@ -150,7 +165,7 @@ p {
 
 .laptime-field {
   width: 6rem;
-  padding: 0 15px;
+  padding-left: 10px;
   text-align: Left;
   display: flex;
   flex-direction: column;
@@ -180,7 +195,7 @@ p {
 }
 
 .segment {
-  width: 1rem;
+  width: 0.7rem;
   height: 0.25rem;
   border-radius: 10%;
   margin: 0 2px;
@@ -191,6 +206,9 @@ p {
 .laptime-field > p,
 .sector-time > p {
   font-size: 0.9rem;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
 }
 
 .tire-laps,
