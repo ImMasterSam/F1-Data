@@ -8,6 +8,7 @@
   transition: all 0.3s ease-in-out;
   overflow: hidden;
   position: sticky;
+  flex-shrink: 0;
 }
 .side-bar.expanded {
   width: 200px;

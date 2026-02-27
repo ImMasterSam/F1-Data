@@ -20,7 +20,7 @@
 }
 
 .dashboard {
-  width: fit-content;
+  flex: 0 0 auto;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -50,13 +50,19 @@
   padding: 0 20px;
 }
 
+.grandPrix-title > h2 {
+  width: fit-content;
+  display: flex;
+  padding: 0 20px;
+}
+
 .drivers-table {
   width: 100%;
   flex: 1 1 0;
   display: grid;
   grid-auto-rows: 1fr;
   align-items: stretch;
-  overflow: auto;
+  overflow-y: scroll;
 }
 
 
@@ -128,7 +134,7 @@
 
 .tire-feild {
   width: 6.5rem;
-  padding: 0 15px;
+  padding-left: 15px;
   text-align: Left;
   display: flex;
   flex-direction: column;
@@ -141,7 +147,7 @@ p {
 
 .gap-feild {
   width: 6rem;
-  padding: 0 15px;
+  padding-left: 15px;
   text-align: Left;
   display: flex;
   flex-direction: column;
@@ -150,7 +156,7 @@ p {
 
 .laptime-field {
   width: 6rem;
-  padding: 0 15px;
+  padding-left: 15px;
   text-align: Left;
   display: flex;
   flex-direction: column;
@@ -180,7 +186,7 @@ p {
 }
 
 .segment {
-  width: 1rem;
+  width: 0.7rem;
   height: 0.25rem;
   border-radius: 10%;
   margin: 0 2px;
