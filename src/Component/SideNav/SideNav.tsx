@@ -23,12 +23,12 @@ function SideNav() {
     setIsExpanded(!isExpanded)
   }
 
-  return <nav className='side-bar'>
+  return <nav className={`side-bar ${isExpanded ? 'expanded' : 'collapsed'}`}>
     <button onClick={toggleExpanded}>
       {isExpanded ? <LuPanelRightOpen /> : <LuPanelLeftOpen />}
     </button>
     {NavItems.map((nav, index) => {
-      return <NavItem navItem={nav} index={index} isExpanded={isExpanded} key={index}/>
+      return <NavItem navItem={nav} index={index} key={index}/>
     })}
   </nav>
 }

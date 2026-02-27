@@ -8,14 +8,13 @@ type Props = {
     icon: ReactElement;
   }
   index: number;
-  isExpanded: boolean
 }
 
 
-function NavItem({ navItem, index, isExpanded }: Props) {
+function NavItem({ navItem, index }: Props) {
   return <Link title={navItem.label} to={navItem.href} className='nav-item' key={index}>
     {navItem.icon}
-    {isExpanded && <h3>{navItem.label}</h3>}
+    <h3>{navItem.label}</h3>
   </Link>
 }
 
