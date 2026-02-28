@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactElement } from "react";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { FaChevronUp } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 type Props = {

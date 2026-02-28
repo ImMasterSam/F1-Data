@@ -6,6 +6,7 @@ import SideNav from './Component/SideNav/SideNav'
 import DriversPage from './Page/StandingPage/DriversPage'
 import ConstructorsPage from './Page/StandingPage/ConstructorsPage'
 import './CSS/App.css'
+import { FaGithub } from 'react-icons/fa'
 
 function App() {
 
@@ -15,7 +16,12 @@ function App() {
         <SideNav />
         <div className='main-container'>
 
-            <h1>F1 Data Analysis</h1>
+            <div className='main-title'>
+              <h1>F1 Data Analysis</h1>
+              <a href='https://github.com/ImMasterSam/F1-Data' target="_blank" rel="noopener noreferrer">
+                <FaGithub />
+              </a>
+            </div>
 
             <Routes>
               <Route index element={<HomePage />}/>
