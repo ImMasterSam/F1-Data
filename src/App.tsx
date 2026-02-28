@@ -1,9 +1,10 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import StandingPage from './Page/StandingPage'
 import HomePage from './Page/HomePage'
 import SchedulePage from './Page/SchedulePage'
 import LiveTimingPage from './Page/LiveTimingPage'
 import SideNav from './Component/SideNav/SideNav'
+import DriversPage from './Page/StandingPage/DriversPage'
+import ConstructorsPage from './Page/StandingPage/ConstructorsPage'
 import './CSS/App.css'
 
 function App() {
@@ -19,7 +20,8 @@ function App() {
             <Routes>
               <Route index element={<HomePage />}/>
               <Route path='livetiming' element={<LiveTimingPage />} />
-              <Route path='standings' element={<StandingPage />} />
+              <Route path='standings/drivers' element={<DriversPage />} />
+              <Route path='standings/constructors' element={<ConstructorsPage />} />
               <Route path='schedule' element={<SchedulePage />} />
             </Routes>        
         </div>

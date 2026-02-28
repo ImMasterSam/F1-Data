@@ -5,14 +5,40 @@ import '../../CSS/SideNav.css'
 import { AiFillHome } from "react-icons/ai";
 import { BsBroadcast } from "react-icons/bs";
 import { FaTrophy } from "react-icons/fa";
-import { RiCalendarScheduleFill } from "react-icons/ri";
+import { RiCalendarScheduleFill, RiTeamFill } from "react-icons/ri";
 import { LuPanelLeftOpen, LuPanelRightOpen } from "react-icons/lu";
+import { GiFullMotorcycleHelmet } from "react-icons/gi";
 
 const NavItems = [
-  { label: 'Home', href: '/', icon: <AiFillHome /> },
-  { label: 'Live Timing', href: '/livetiming', icon: <BsBroadcast /> },
-  { label: 'Standings', href: '/standings', icon: <FaTrophy /> },
-  { label: 'Schedule', href: '/schedule', icon: <RiCalendarScheduleFill /> },
+  { 
+    label: 'Home',
+    href: '/',
+    icon: <AiFillHome />,
+    index: 0
+  },
+  { 
+    label: 'Live Timing',
+    href: '/livetiming',
+    icon: <BsBroadcast />,
+    index: 1
+  },
+  { 
+    label: 'Standings',
+    href: '/standings',
+    icon: <FaTrophy />,
+    index: 2,
+    children: [
+      { label: 'Drivers', href: '/standings/drivers', icon: <GiFullMotorcycleHelmet />, index: 0 },
+      { label: 'Constructors', href: '/standings/constructors', icon: <RiTeamFill />, index: 1 }
+    ],
+    
+  },
+  { 
+    label: 'Schedule',
+    href: '/schedule',
+    icon: <RiCalendarScheduleFill />,
+    index: 3
+  },
 ]
 
 function SideNav() {
@@ -22,13 +48,16 @@ function SideNav() {
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded)
   }
+  const openExpanded = () => {
+    setIsExpanded(true)
+  }
 
   return <nav className={`side-bar ${isExpanded ? 'expanded' : 'collapsed'}`}>
     <button onClick={toggleExpanded}>
       {isExpanded ? <LuPanelRightOpen /> : <LuPanelLeftOpen />}
     </button>
     {NavItems.map((nav, index) => {
-      return <NavItem navItem={nav} index={index} key={index}/>
+      return <NavItem label={nav.label} href={nav.href} icon={nav.icon} children={nav.children} openSideNav={openExpanded} isSideNavExpanded={isExpanded} index={nav.index} key={index}/>
     })}
   </nav>
 }
