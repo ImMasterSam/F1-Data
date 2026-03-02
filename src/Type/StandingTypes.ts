@@ -38,3 +38,8 @@ export type DriversPointsEvolution = {
     round: string;
     [key: string]: string | number;
 };
+
+export interface DriversRankEvolution {
+    round: number;
+    [driverCode: string]: number | string; 
+}

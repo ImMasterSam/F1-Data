@@ -52,21 +52,16 @@ td {
 
 .driverName-field {
     width: 60%;
+    cursor: pointer;
 }
 
 tbody > tr {
     border-bottom: #464646 0.5px solid;
     transition: all 0.15s ease;
-    cursor: pointer;
 }
 
 tbody > tr:hover {
     background-color: #464646;
-}
-
-tbody > tr:hover .driverName-field {
-    transform: scale(1.1);
-    transform-origin: left;
 }
 
 tbody > tr:last-child { 
@@ -172,4 +167,22 @@ tbody > tr:last-child {
     margin-left: 15px;
     font-variant-numeric: tabular-nums; /* 讓數字等寬對齊 */
     color: #ddd;
+}
+
+
+.tooltip-rank-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 3px;
+    color: #ccc;
+}
+
+.tooltip-rank-position {
+    font-weight: bold;
+    width: 30px;
+    font-variant-numeric: tabular-nums;
+}
+
+.tooltip-rank-driver {
+    color: #fff;
 }

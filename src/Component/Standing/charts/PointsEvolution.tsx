@@ -12,14 +12,14 @@ type Props = {
   driverStanding: driverStanding_type[];
 }
 
-type CustomTooltipProps = {
+type PointsCustomTooltipProps = {
   active?: boolean;
   payload?: readonly any[];
   label?: string | number;
-  schedule: race_type[]; // 我們額外傳入的
+  schedule: race_type[];
 };
 
-function EvolutionTooltip({ active, payload, label, schedule }: CustomTooltipProps) {
+function PointsEvolutionTooltip({ active, payload, label, schedule }: PointsCustomTooltipProps) {
   if (active && payload && payload.length) {
     
     // Grand Prix Name
@@ -91,15 +91,18 @@ function PointsEvolution({year, schedule, driverStanding}: Props) {
             
             <XAxis 
               dataKey="round"
-              label={{ value: 'Round', position: 'insideBottom', offset: -10 }}
+              label={{ value: 'Round', position: 'insideBottom', offset: -10, fill: '#fff' }}
+              stroke="white"
             />
             <YAxis
               domain={[0, 'max']} 
-              label={{ value: 'Points', angle: -90, position: 'insideLeft' }}
+              label={{ value: 'Points', angle: -90, position: 'insideLeft', fill: '#fff' }}
+              stroke="white"
             />
             <Tooltip 
-              content={(props) => <EvolutionTooltip {...props} schedule={schedule} />} 
+              content={(props) => <PointsEvolutionTooltip {...props} schedule={schedule} />} 
               cursor={{ stroke: '#fff', strokeWidth: 1, strokeDasharray: "4 4" }}
+              wrapperStyle={{ zIndex: 1000 }} 
             />
             {driverKeys.map((key) => {
               const driver = driverStanding.find((driverData) => {

@@ -1,4 +1,4 @@
-import PointsDistribution from "../../Component/Standing/charts/PointsDistribution"
+import PointsDistribution from "../../Component/Standing/charts/RankEvolution"
 import PointsEvolution from "../../Component/Standing/charts/PointsEvolution"
 import ConstructorStanding from "../../Component/Standing/ConstructorStanding"
 import '../../CSS/Standings.css'

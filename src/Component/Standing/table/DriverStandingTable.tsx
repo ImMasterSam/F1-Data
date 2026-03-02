@@ -20,9 +20,9 @@ function DriverStandingTableBody({driverStanding}: Props) {
   return <tbody>
     {driverStanding.map((driver) => {
       return driver
-      ? <tr key={driver.position} onClick={() => {window.open(driver.Driver.url)}}>
+      ? <tr key={driver.position}>
         <td>{driver.position}</td>
-        <td className="f1-style driverName-field" style={{textAlign: 'left'}}>
+        <td className="f1-style driverName-field" style={{textAlign: 'left'}} onClick={() => {window.open(driver.Driver.url)}}>
           <span>
             {driver.Driver.givenName + ' '}
             <span style={{color: team_theme[driver.Constructors[driver.Constructors.length - 1].constructorId], fontWeight: 'bold'}}>
