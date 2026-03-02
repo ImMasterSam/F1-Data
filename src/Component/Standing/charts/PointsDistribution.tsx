@@ -1,9 +1,11 @@
 import { RechartsDevtools } from "@recharts/devtools";
+import { useEffect } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { getPointsEvolution } from "../../../Lib/standingData";
 
 function PointsDistribution() {
 
-  const data = [
+    const data = [
     { name: 'Race 1', uv: 1 },
     { name: 'Race 2', uv: 2 },
     { name: 'Race 3', uv: 3 },

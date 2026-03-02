@@ -33,3 +33,8 @@ export type driverStanding_type = {
   positiontext: string;
   wins: number
 }
+
+export type DriversPointsEvolution = {
+    round: string;
+    [key: string]: string | number;
+};
