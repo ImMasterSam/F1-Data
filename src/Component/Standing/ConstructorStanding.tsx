@@ -35,10 +35,10 @@ function ConstructorStanding() {
   }, [])
 
   return (
-    <>
+    <div className='standings'>
       {errMessage ? <h3>{errMessage}</h3>
       : <ConstructorStandingTable constructorStanding={constructorStanding}/>}
-    </>
+    </div>
   )
 }
 

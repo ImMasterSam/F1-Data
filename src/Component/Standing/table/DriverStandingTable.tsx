@@ -1,6 +1,5 @@
 import { team_theme } from "../../../Lib/TeamTheme";
 import type { driverStanding_type } from "../../../Type/StandingTypes";
-import '../../../CSS/Table.css'
 
 type Props = {
   driverStanding: Array<driverStanding_type>
@@ -41,16 +40,12 @@ function DriverStandingTableBody({driverStanding}: Props) {
 
 function DriverStandingTable({driverStanding}: Props) {
   return (
-    <div className="standings">
-      <h2 className="table-title">Driver Championship Standings</h2>
-      <table className="driverStanding-table">
-          <DriverStandingTableHeader />          
+    <table className="driverStanding-table">
+      <DriverStandingTableHeader />          
 
-          <DriverStandingTableBody driverStanding={driverStanding}/>
+      <DriverStandingTableBody driverStanding={driverStanding}/>
 
-      </table>
-    </div>
-
+    </table>
   );
 }
 

@@ -1,5 +1,4 @@
 import type { constructorStanding_type } from "../../../Type/StandingTypes";
-import '../../../CSS/Table.css'
 
 type Props = {
   constructorStanding: Array<constructorStanding_type>
@@ -36,14 +35,10 @@ function ConstructorStandingTableBody({constructorStanding}: Props) {
 
 function ConstructorStandingTable({constructorStanding}: Props) {
   return (
-    <div className="standings">
-      <h2 className="table-title">Constructor Championship Standings</h2>
-      <table className="constructorStanding-table">
-          <ConstructorStandingTableHeader />
-          <ConstructorStandingTableBody constructorStanding={constructorStanding} />
-      </table>
-    </div>
-
+    <table className="constructorStanding-table">
+      <ConstructorStandingTableHeader />
+      <ConstructorStandingTableBody constructorStanding={constructorStanding} />
+    </table>
   );
 }
 

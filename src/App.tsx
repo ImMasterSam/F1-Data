@@ -5,8 +5,8 @@ import LiveTimingPage from './Page/LiveTimingPage'
 import SideNav from './Component/SideNav/SideNav'
 import DriversPage from './Page/StandingPage/DriversPage'
 import ConstructorsPage from './Page/StandingPage/ConstructorsPage'
-import './CSS/App.css'
 import { FaGithub } from 'react-icons/fa'
+import './CSS/App.css'
 
 function App() {
 

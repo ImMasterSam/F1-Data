@@ -35,10 +35,10 @@ function DriverStanding() {
   }, [])
 
   return (
-    <>
+    <div className='standings'>
       {errMessage ? <h3>{errMessage}</h3>
       : <DriverStandingTable driverStanding={driverStanding}/>}
-    </>
+    </div>
   )
 }
 
