@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react"
-import PointsDistribution from "../../Component/Standing/charts/RankEvolution"
 import PointsEvolution from "../../Component/Standing/charts/PointsEvolution"
 import DriverStanding from "../../Component/Standing/DriverStanding"
-import '../../CSS/Standings.css'
 import type { driverStanding_type } from "../../Type/StandingTypes"
 import { fetchScheduleList, getDriverStanding } from "../../Lib/Fetch"
 import type { race_type } from "../../Type/RaceTypes"
 import RankEvolution from "../../Component/Standing/charts/RankEvolution"
+import '../../CSS/Standings.css'
 
 function DriversPage() {
 
@@ -32,8 +31,8 @@ function DriversPage() {
       <div className="standing-container">
         <DriverStanding driverStanding={driverStanding}/>
         <div className="standing-chart">
-          <PointsEvolution year={year} schedule={schedule} driverStanding={driverStanding}/>
-          <RankEvolution year={year} schedule={schedule} driverStanding={driverStanding}/>
+          <PointsEvolution type='driver' year={year} schedule={schedule} standing={driverStanding}/>
+          <RankEvolution type='driver' year={year} schedule={schedule} standing={driverStanding}/>
         </div>
       </div>}
 

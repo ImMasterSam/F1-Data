@@ -1,15 +1,16 @@
 import { RechartsDevtools } from "@recharts/devtools";
 import { useEffect, useState } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { getPointsEvolution } from "../../../Lib/standingData";
-import type { DriversPointsEvolution, driverStanding_type } from "../../../Type/StandingTypes";
+import { getConstructorPointsEvolution, getDriverPointsEvolution } from "../../../Lib/standingData";
+import type { pointsEvolution_type, driverStanding_type, constructorStanding_type } from "../../../Type/StandingTypes";
 import { team_theme } from "../../../Lib/TeamTheme";
 import type { race_type } from "../../../Type/RaceTypes";
 
 type Props = {
+  type?: 'driver' | 'constructor';
   year: number;
   schedule: race_type[]
-  driverStanding: driverStanding_type[];
+  standing: driverStanding_type[] | constructorStanding_type[];
 }
 
 type PointsCustomTooltipProps = {
@@ -31,6 +32,7 @@ function PointsEvolutionTooltip({ active, payload, label, schedule }: PointsCust
 
     return (
       <div className="custom-tooltip">
+
         {/* 標題與分站名稱 */}
         <div className="tooltip-header">
           <p className="tooltip-race-name">{raceName}</p>
@@ -42,7 +44,6 @@ function PointsEvolutionTooltip({ active, payload, label, schedule }: PointsCust
           {sortedPayload.map((entry: any) => (
             <div key={entry.name} className="tooltip-item">
               <div className="tooltip-driver-info">
-                {/* 顏色圓點 */}
                 <span 
                   className="tooltip-color-dot" 
                   style={{ backgroundColor: entry.color }}
@@ -60,33 +61,42 @@ function PointsEvolutionTooltip({ active, payload, label, schedule }: PointsCust
   return null;
 }
 
-function PointsEvolution({year, schedule, driverStanding}: Props) {
+function PointsEvolution({type, year, schedule, standing}: Props) {
 
-  const [evolutionData, setEvolutionData] = useState<DriversPointsEvolution[]>([]);
-  const [driverKeys, setDriverKeys] = useState<string[]>([])
+  const [evolutionData, setEvolutionData] = useState<pointsEvolution_type[]>([]);
+  const [dataKeys, setDataKeys] = useState<string[]>([]);
 
   useEffect(() => {
-    getPointsEvolution(year).then((data) => {
+
+    const fetchData = async () => {
+      let data: pointsEvolution_type[] = [];
+      
+      if (type === 'driver') {
+        data = await getDriverPointsEvolution(year);
+      } else {
+        data = await getConstructorPointsEvolution(year);
+      }
+
       setEvolutionData(data);
-      console.log(data);
+      console.log(`${type} Evolution Data:`, data);
 
       if (data.length > 0){
         const keys = Object.keys(data[data.length-1])
-        console.log('Driver Keys:', keys);
-        const drivers = keys.filter((key) => {return key !== 'round'})
-        console.log('Driver Keys:', drivers);
-        setDriverKeys(drivers)
+        // 過濾掉非參賽者資料的 key
+        const validKeys = keys.filter((key) => key !== 'round' && key !== 'name');
+        setDataKeys(validKeys)
       }
+    };
 
-    })
-  }, [year])
+    fetchData();
+  }, [year, type])
   
     return (
       <div className="standing-chart-container">
         <RechartsDevtools />
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={evolutionData} margin={{ top: 5, right: 20, bottom: 20, left: 20 }}>
-            {/* 格線淺一點：設定 stroke 為深灰色並降低透明度 */}
+
             <CartesianGrid strokeDasharray="3 3" stroke="#444" opacity={0.9} />
             
             <XAxis 
@@ -104,13 +114,26 @@ function PointsEvolution({year, schedule, driverStanding}: Props) {
               cursor={{ stroke: '#fff', strokeWidth: 1, strokeDasharray: "4 4" }}
               wrapperStyle={{ zIndex: 1000 }} 
             />
-            {driverKeys.map((key) => {
-              const driver = driverStanding.find((driverData) => {
-                return driverData.Driver.code == key;
-              })
-              if (!driver) return null;
+            {dataKeys.map((key) => {
 
-              const teamColor = team_theme[driver.Constructors?.[driver.Constructors.length-1].constructorId];
+              let teamColor: string = "#888";
+              
+              if (type === 'driver') {
+                const driver = (standing as driverStanding_type[]).find((driverData) => {
+                  return driverData.Driver.code == key;
+                })
+                if (!driver) return null;
+
+                teamColor = team_theme[driver.Constructors?.[driver.Constructors.length-1].constructorId];
+
+              }
+              else if (type === 'constructor'){
+                const constructor = (standing as constructorStanding_type[]).find((constructorData) => {
+                  return constructorData.Constructor.name == key;
+                })
+                if (!constructor) return null;
+                teamColor = team_theme[constructor.Constructor.constructorId]
+              }
 
               return (
                 <Line 
@@ -118,7 +141,7 @@ function PointsEvolution({year, schedule, driverStanding}: Props) {
                   key={key} 
                   dataKey={key} 
                   stroke={teamColor}
-                  strokeWidth={3} /* 線再粗一點 */
+                  strokeWidth={3}
                   dot={{ r: 3, strokeWidth: 0, fill: teamColor }}
                   activeDot={{ r: 6, stroke: '#fff', strokeWidth: 2 }}
                 />

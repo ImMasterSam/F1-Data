@@ -88,3 +88,18 @@ export async function getDriverStandingByRound(year: number, round: number): Pro
 
   return standingList
 }
+
+export async function getConstructorStandingByRound(year: number, round: number): Promise<Array<constructorStanding_type>> {
+  
+  const srcURL = `https://api.jolpi.ca/ergast/f1/${year}/${round}/constructorstandings`
+  const response = await fetch(srcURL, requestOption);
+
+  if (!response.ok){
+    throw new Error(`Error! status: ${response.status}`)
+  }
+
+  const jsonContent = await response.json()
+  const standingList: Array<constructorStanding_type> = jsonContent.MRData.StandingsTable.StandingsLists[0].ConstructorStandings
+
+  return standingList
+}

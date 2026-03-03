@@ -34,12 +34,12 @@ export type driverStanding_type = {
   wins: number
 }
 
-export type DriversPointsEvolution = {
+export type pointsEvolution_type = {
     round: string;
     [key: string]: string | number;
 };
 
-export interface DriversRankEvolution {
+export interface rankEvolution_type {
     round: number;
     [driverCode: string]: number | string; 
 }

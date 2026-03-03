@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { CartesianGrid, LabelList, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { getPointsEvolution, getRankEvolution } from "../../../Lib/standingData";
-import type { DriversRankEvolution, driverStanding_type } from "../../../Type/StandingTypes";
+import { getConstructorPointsEvolution, getDriverPointsEvolution, getRankEvolution } from "../../../Lib/standingData";
+import type { rankEvolution_type, driverStanding_type, pointsEvolution_type, constructorStanding_type } from "../../../Type/StandingTypes";
 import { team_theme } from "../../../Lib/TeamTheme";
 import type { race_type } from "../../../Type/RaceTypes";
 
 type Props = {
+  type?: 'driver' | 'constructor';
   year: number;
   schedule: race_type[]
-  driverStanding: driverStanding_type[];
+  standing: driverStanding_type[] | constructorStanding_type[];
 }
 
 type RankCustomTooltipProps = {
@@ -52,38 +53,51 @@ const RankSingleTooltip = ({ active, payload, label, schedule, hoverDriver }: Ra
   return null;
 };
 
-function RankEvolution({year, schedule, driverStanding}: Props) {
+function RankEvolution({type, year, schedule, standing}: Props) {
 
-  const [rankData, setRankData] = useState<DriversRankEvolution[]>([]);
-  const [driverKeys, setDriverKeys] = useState<string[]>([]);
+  const [rankData, setRankData] = useState<rankEvolution_type[]>([]);
+  const [dataKeys, setDataKeys] = useState<string[]>([]);
 
-  const [hoverDriver, setHoverDriver] = useState<string | null>(null);
+  const [hoverData, setHoverData] = useState<string | null>(null);
 
   useEffect(() => {
-    getPointsEvolution(year).then((data) => {
-      const pointData = getRankEvolution(data);
-      setRankData(pointData);
-      if (data.length > 0){
-        // 取得所有車手 Key (排除 name 和 round)
-        const keys = Object.keys(data[data.length - 1]).filter(k => k !== 'round');
-        console.log('Driver Rank keys', keys);
-        setDriverKeys(keys);
-      }
-    })
-  }, [year])
+      
+      const fetchData = async () => {
+        let data: pointsEvolution_type[] = [];
+        
+        if (type === 'driver') {
+          data = await getDriverPointsEvolution(year);
+        } else {
+          data = await getConstructorPointsEvolution(year);
+        }
+        
+        const rankData = getRankEvolution(data)
+        setRankData(rankData);
+        console.log(`${type} Evolution Data:`, data);
+  
+        if (data.length > 0){
+          const keys = Object.keys(data[data.length-1])
+          // 過濾掉非參賽者資料的 key
+          const validKeys = keys.filter((key) => key !== 'round' && key !== 'name');
+          setDataKeys(validKeys)
+        }
+      };
+  
+      fetchData();
+    }, [year, type])
 
   const handleLineHover = (driverKey: string) => {
-    setHoverDriver(driverKey);
+    setHoverData(driverKey);
   }
   const handleLineLeave = () => {
-    setHoverDriver(null);
+    setHoverData(null);
   }
 
 
   return (
     <div className="standing-chart-container">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={rankData} margin={{ top: 5, right: 50, bottom: 20, left: 40 }} onMouseLeave={handleLineLeave}>
+        <LineChart data={rankData} margin={{ top: 5, right: (type === 'constructor' ? 140 : 50), bottom: 20, left: 40 }} onMouseLeave={handleLineLeave}>
           <CartesianGrid strokeDasharray="3 3" stroke="#444" opacity={0.9} horizontal={false} />
           
           <XAxis 
@@ -103,7 +117,7 @@ function RankEvolution({year, schedule, driverStanding}: Props) {
           />
           
           <Tooltip 
-            content={(props) => <RankSingleTooltip {...props} schedule={schedule} hoverDriver={hoverDriver} />}
+            content={(props) => <RankSingleTooltip {...props} schedule={schedule} hoverDriver={hoverData} />}
             trigger="hover"
             cursor={false}
           />
@@ -111,13 +125,28 @@ function RankEvolution({year, schedule, driverStanding}: Props) {
           {/* 減少 Legend 擁擠，只顯示前幾名或讓使用者互動 highlight */}
           {/* <Legend /> */} 
 
-          {driverKeys.map((key) => {
-             const driver = driverStanding.find(d => d.Driver.code === key);
-             if (!driver) return null;
-             
-             const teamColor = team_theme[driver.Constructors?.[driver.Constructors.length-1].constructorId] || "#fff";
-             const lineOpacity = (hoverDriver && hoverDriver !== key) ? 0.6 : 1;
-             const strokeWidth = (hoverDriver === key) ? 6 : 3;
+          {dataKeys.map((key) => {
+
+             let teamColor: string = "#888";
+                           
+            if (type === 'driver') {
+              const driver = (standing as driverStanding_type[]).find((driverData) => {
+                return driverData.Driver.code == key;
+              })
+              if (!driver) return null;
+
+              teamColor = team_theme[driver.Constructors?.[driver.Constructors.length-1].constructorId];
+
+            }
+            else if (type === 'constructor'){
+              const constructor = (standing as constructorStanding_type[]).find((constructorData) => {
+                return constructorData.Constructor.name == key;
+              })
+              if (!constructor) return null;
+              teamColor = team_theme[constructor.Constructor.constructorId]
+            }
+             const lineOpacity = (hoverData && hoverData !== key) ? 0.6 : 1;
+             const strokeWidth = ((hoverData === key) ? 6 : 3) + (type === 'constructor' ? 2 : 0);
 
              return (<>
               <Line
@@ -157,7 +186,7 @@ function RankEvolution({year, schedule, driverStanding}: Props) {
                           dy={4} 
                           dx={8} 
                           fill={teamColor} 
-                          fontSize={12} 
+                          fontSize={type === 'constructor' ? 16 : 12} 
                           fontWeight="bold"
                           textAnchor="start"
                           opacity={lineOpacity}
