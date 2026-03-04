@@ -17,7 +17,7 @@ export async function getDriverPointsEvolution(year: number): Promise<pointsEvol
             await new Promise(r => setTimeout(r, 10)); 
             
             try {
-                const standings = await getDriverStandingByRound(year, round);
+                let standings = await getDriverStandingByRound(year, round);
                 results.push({ round, standings });
             } catch (err) {
                 console.warn(`Failed to fetch rnd ${round}`, err);
@@ -34,7 +34,13 @@ export async function getDriverPointsEvolution(year: number): Promise<pointsEvol
 
             standings.forEach((driver: driverStanding_type) => {
                 // Using driver code as key and points as value for the line chart
-                roundData[driver.Driver.code] = parseFloat(driver.points as unknown as string); 
+                let driverKey = '';
+                if (driver.Driver.code)
+                    driverKey = driver.Driver.code; 
+                else {
+                    driverKey = driver.Driver.familyName.slice(0,3).toUpperCase();
+                }
+                roundData[driverKey] = parseFloat(driver.points as unknown as string); 
             });
 
             evolutionData.push(roundData);
@@ -64,7 +70,7 @@ export async function getConstructorPointsEvolution(year: number): Promise<point
             await new Promise(r => setTimeout(r, 10)); 
             
             try {
-                const standings = await getConstructorStandingByRound(year, round);
+                let standings = await getConstructorStandingByRound(year, round);
                 results.push({ round, standings });
             } catch (err) {
                 console.warn(`Failed to fetch rnd ${round}`, err);

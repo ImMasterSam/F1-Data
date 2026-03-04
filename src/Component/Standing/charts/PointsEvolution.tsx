@@ -1,4 +1,3 @@
-import { RechartsDevtools } from "@recharts/devtools";
 import { useEffect, useState } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { getConstructorPointsEvolution, getDriverPointsEvolution } from "../../../Lib/standingData";
@@ -68,6 +67,8 @@ function PointsEvolution({type, year, schedule, standing}: Props) {
 
   useEffect(() => {
 
+    setEvolutionData([])
+
     const fetchData = async () => {
       let data: pointsEvolution_type[] = [];
       
@@ -78,13 +79,14 @@ function PointsEvolution({type, year, schedule, standing}: Props) {
       }
 
       setEvolutionData(data);
-      console.log(`${type} Evolution Data:`, data);
+      console.log(`${type} Points Evolution Data:`, data);
 
       if (data.length > 0){
         const keys = Object.keys(data[data.length-1])
         // 過濾掉非參賽者資料的 key
         const validKeys = keys.filter((key) => key !== 'round' && key !== 'name');
         setDataKeys(validKeys)
+        console.log(`${type} Points Evolution Data Key:`, validKeys);
       }
     };
 
@@ -93,20 +95,19 @@ function PointsEvolution({type, year, schedule, standing}: Props) {
   
     return (
       <div className="standing-chart-container">
-        <RechartsDevtools />
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={evolutionData} margin={{ top: 5, right: 20, bottom: 20, left: 20 }}>
+          <LineChart data={evolutionData} margin={{ top: 10, right: 20, bottom: 20, left: 20 }}>
 
             <CartesianGrid strokeDasharray="3 3" stroke="#444" opacity={0.9} />
             
             <XAxis 
               dataKey="round"
-              label={{ value: 'Round', position: 'insideBottom', offset: -10, fill: '#fff' }}
+              label={{ value: 'Round', fontWeight: 'bold', position: 'insideBottom', offset: -10, fill: '#fff' }}
               stroke="white"
             />
             <YAxis
               domain={[0, 'max']} 
-              label={{ value: 'Points', angle: -90, position: 'insideLeft', fill: '#fff' }}
+              label={{ value: 'Points', fontWeight: 'bold', angle: -90, position: 'insideLeft', fill: '#fff' }}
               stroke="white"
             />
             <Tooltip 
@@ -120,7 +121,12 @@ function PointsEvolution({type, year, schedule, standing}: Props) {
               
               if (type === 'driver') {
                 const driver = (standing as driverStanding_type[]).find((driverData) => {
-                  return driverData.Driver.code == key;
+                  let driverKey = '';
+                  if (driverData.Driver.code)
+                      driverKey = driverData.Driver.code; 
+                  else
+                      driverKey = driverData.Driver.familyName.slice(0,3).toUpperCase();
+                  return driverKey === key
                 })
                 if (!driver) return null;
 

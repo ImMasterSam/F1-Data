@@ -8,7 +8,7 @@ export type constructor_type = {
 export type driver_type = {
   driverId: string;
   permanentNumber: number;
-  code: string;
+  code?: string;
   url: string;
   givenName: string;
   familyName: string;
@@ -19,8 +19,8 @@ export type driver_type = {
 export type constructorStanding_type = {
   Constructor: constructor_type;
   points: number;
-  position: number;
-  positiontext: string;
+  position?: number;
+  positionText: string;
   wins: number
 }
 
@@ -29,8 +29,8 @@ export type driverStanding_type = {
   Driver: driver_type;
   Constructors: constructor_type[];
   points: number;
-  position: number;
-  positiontext: string;
+  position?: number;
+  positionText: string;
   wins: number
 }
 

@@ -61,30 +61,32 @@ function RankEvolution({type, year, schedule, standing}: Props) {
   const [hoverData, setHoverData] = useState<string | null>(null);
 
   useEffect(() => {
+
+    setRankData([])
       
-      const fetchData = async () => {
-        let data: pointsEvolution_type[] = [];
-        
-        if (type === 'driver') {
-          data = await getDriverPointsEvolution(year);
-        } else {
-          data = await getConstructorPointsEvolution(year);
-        }
-        
-        const rankData = getRankEvolution(data)
-        setRankData(rankData);
-        console.log(`${type} Evolution Data:`, data);
-  
-        if (data.length > 0){
-          const keys = Object.keys(data[data.length-1])
-          // 過濾掉非參賽者資料的 key
-          const validKeys = keys.filter((key) => key !== 'round' && key !== 'name');
-          setDataKeys(validKeys)
-        }
-      };
-  
-      fetchData();
-    }, [year, type])
+    const fetchData = async () => {
+      let data: pointsEvolution_type[] = [];
+      
+      if (type === 'driver') {
+        data = await getDriverPointsEvolution(year);
+      } else {
+        data = await getConstructorPointsEvolution(year);
+      }
+      
+      const rankData = getRankEvolution(data)
+      setRankData(rankData);
+      console.log(`${type} Evolution Data:`, data);
+
+      if (data.length > 0){
+        const keys = Object.keys(data[data.length-1])
+        // 過濾掉非參賽者資料的 key
+        const validKeys = keys.filter((key) => key !== 'round' && key !== 'name');
+        setDataKeys(validKeys)
+      }
+    };
+
+    fetchData();
+  }, [year, type])
 
   const handleLineHover = (driverKey: string) => {
     setHoverData(driverKey);
@@ -102,15 +104,14 @@ function RankEvolution({type, year, schedule, standing}: Props) {
           
           <XAxis 
               dataKey="round"
-              label={{ value: 'Round', position: 'insideBottom', offset: -10, fill: '#fff' }}
+              label={{ value: 'Round', fontWeight: 'bold', position: 'insideBottom', offset: -10, fill: '#fff' }}
               stroke="white"
           />
           <YAxis 
-            label={{ value: 'Rank', angle: -90, position: 'insideLeft', offset: -20, fill: '#fff' }}
+            label={{ value: 'Rank', fontWeight: 'bold', angle: -90, position: 'insideLeft', offset: -20, fill: '#fff' }}
             reversed={true} 
             domain={[1, 'max']} 
             tickCount={10}      
-            tick={{fill: '#888'}}
             width={40}
             padding={{ top: 20, bottom: 20 }}
               stroke="white"
@@ -131,7 +132,12 @@ function RankEvolution({type, year, schedule, standing}: Props) {
                            
             if (type === 'driver') {
               const driver = (standing as driverStanding_type[]).find((driverData) => {
-                return driverData.Driver.code == key;
+                let driverKey = '';
+                if (driverData.Driver.code)
+                    driverKey = driverData.Driver.code; 
+                else
+                    driverKey = driverData.Driver.familyName.slice(0,3).toUpperCase();
+                return driverKey === key
               })
               if (!driver) return null;
 
