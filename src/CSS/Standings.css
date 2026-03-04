@@ -48,6 +48,7 @@ td {
 
 .constructorName-field {
     width: 60%;
+    cursor: pointer;
 }
 
 .driverName-field {
