@@ -1,4 +1,6 @@
 export const themes: {[team: string]: string} = {
+  'audi': '#F50537',
+  'cadillac': '#909090',
   'mclaren': '#F47600',
   'mercedes': '#00D7B6',
   'red_bull': '#4781D7',
