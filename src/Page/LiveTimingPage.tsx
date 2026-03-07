@@ -70,8 +70,8 @@ function LiveTimingPage() {
 
     cleanUpStream()
 
-    // const url = 'http://127.0.0.1:5000/stream/live'
-    const url = 'https://f1lab-api.com/stream/live'
+    const url = 'http://127.0.0.1:5000/stream/live'
+    // const url = 'https://f1lab-api.com/stream/live'
     console.log(`[INFO] Trying to connect to ${url}`)
 
     let eventSource = new EventSource(url)

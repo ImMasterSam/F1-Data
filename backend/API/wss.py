@@ -15,13 +15,15 @@ data_global: dict = None
 driver_global: dict = None
 last_driver_received: datetime.datetime = None
 
+logger = logging.getLogger(__name__)
+
 SUBS_TITLE = ["TimingData", "TimingStats", "TimingAppData", "CarData.z", "Position.z", "WeatherData", "TrackStatus", "ExtrapolatedClock", "RaceControlMessages", "TeamRadio", "LapCount", "SessionInfo"]
 
 
 def restart_wss():
 
     global ws_global, should_restart
-    print("Restarting WebSocket connection due to session change...")
+    logger.info("Restarting WebSocket connection due to session change...")
 
     if ws_global:
         ws_global.close()
@@ -38,7 +40,7 @@ def get_current_session_path():
             data = json.loads(res.content.decode('utf-8-sig'))
             return data.get('Path', '')
     except Exception as e:
-        logging.error(f"Error fetching current session path: {e}")
+        logger.error(f"Error fetching current session path: {e}")
 
 def monitor_session():
 
@@ -51,7 +53,7 @@ def monitor_session():
                 continue
 
             if active_path != current_session_path:
-                print(f"Session path changed from {current_session_path} to {active_path}")
+                logger.info(f"Session path changed from {current_session_path} to {active_path}")
                 restart_wss()
 
                 if not wss_thread.is_alive():
@@ -59,7 +61,7 @@ def monitor_session():
                     wss_thread.start()
 
         except Exception as e:
-            logging.error(f"Error monitoring session: {e}")
+            logger.error(f"Error monitoring session: {e}")
 
 def negotiate(hub):
 
@@ -94,7 +96,7 @@ def connect_wss():
     ]
 
     def on_open(ws: websocket.WebSocketApp):
-        print("WebSocket opened")
+        logger.info("WebSocket opened")
         subscribe_titles = SUBS_TITLE.copy()
         subscribe_titles.append("DriverList")
         subscribe_titles.append("Heartbeat")
@@ -129,7 +131,7 @@ def connect_wss():
             if driver_global is None:
                 subscribe_titles.append("DriverList")
             elif last_driver_received is None or (datetime.datetime.now() - last_driver_received).total_seconds() > 300:
-                print("DriverList is None or not received in the last 5 minutes, resubscribing")
+                logger.info("DriverList is None or not received in the last 5 minutes, resubscribing")
                 subscribe_titles.append("DriverList")
 
             subscribe_msg = {
@@ -142,10 +144,10 @@ def connect_wss():
             # print("Sent subscribe message")
 
     def on_error(ws, error):
-        print("error:", error)
+        logger.error("WebSocket error: %s", error)
 
     def on_close(ws, close_status_code, close_msg):
-        print("WebSocket closed")
+        logger.warning("WebSocket closed")
 
     ws = websocket.WebSocketApp(
         url,

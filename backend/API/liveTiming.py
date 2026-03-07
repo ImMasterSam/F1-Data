@@ -11,6 +11,7 @@ import pandas as pd
 import datetime
 import threading
 import time
+import logging
 
 import wss
 
@@ -369,7 +370,8 @@ def get_team_radio_info(radio_raw_data: dict, session_raw_data: dict, drivers_ra
 def get_live_timing() -> dict:
     """Get the live timing data from the WebSocket connection"""
 
-    global current_session
+    global current_session 
+    logger = logging.getLogger(__name__)
 
     # Load current session
     # session: Session = current_session.get('session')
@@ -390,8 +392,7 @@ def get_live_timing() -> dict:
         raceControlMessages_raw_data: dict = wss.data_global.get('RaceControlMessages', {})
         radio_raw_data: dict = wss.data_global.get('TeamRadio', {})
     except Exception as e:
-        print(f"Error retrieving live timing data: {e}")
-        print("No live data available yet")
+        logging.exception("Error retrieving live timing data")
         return res
     
     meeting_data: dict = session_raw_data.get('Meeting', {})
@@ -406,7 +407,7 @@ def get_live_timing() -> dict:
     if update_current_session(res['grandPrixName'], session_type):
         wss.wss_thread = threading.Thread(target=wss.connect_wss, daemon=True)
         wss.wss_thread.start()
-        print("Current session updated successfully.")
+        logger.info("Current session updated successfully.")
     
     position_data = decompressed_posData(pos_raw_data)
     res['circuit'] = get_circuit_info(meeting_data, position_data, drivers_raw_data, timing_raw_data)
