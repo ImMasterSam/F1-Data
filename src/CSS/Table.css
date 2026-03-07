@@ -1,0 +1,75 @@
+.standings {
+    width: 100%;
+    min-width: 500px;
+    padding: 10px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+
+table {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    border-collapse: collapse;
+    overflow: hidden;
+}
+
+th {
+    padding: 15px;
+    border-bottom: gray 2px solid;
+}
+
+td {
+    text-align: center;
+    padding: 5px;
+    transition: all 0.15s;
+    overflow: hidden;
+}
+
+.constructorName-field {
+    width: 60%;
+}
+
+.driverName-field {
+    width: 60%;
+}
+
+tbody > tr {
+    border-bottom: #464646 0.5px solid;
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+
+tbody > tr:hover {
+    background-color: #464646;
+}
+
+tbody > tr:hover td {
+    transform: scale(1.2);
+}
+
+tbody > tr:hover .driverName-field {
+    transform: scale(1.1);
+    transform-origin: left;
+}
+
+tbody > tr:last-child { 
+    border-bottom: none; 
+}
+
+.table-title {
+    width: 100%;
+    text-align: left;
+    padding: 10px 0;
+}
+
+.team-logo {
+    width: 30px;
+    height: 30px;
+}
+
+.f1-style {
+    font-family: 'F1';
+}

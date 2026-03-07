@@ -1,6 +1,4 @@
-export const themes: {[team: string]: string} = {
-  'audi': '#F50537',
-  'cadillac': '#909090',
+export const team_theme: {[team: string]: string} = {
   'mclaren': '#F47600',
   'mercedes': '#00D7B6',
   'red_bull': '#4781D7',
@@ -11,17 +9,4 @@ export const themes: {[team: string]: string} = {
   'haas': '#9C9FA2',
   'alpine': '#00A1E8	',
   'sauber': '#01C00E',
-  "alfa": '#900000',
-  "alphatauri": '#5a6e86',
-  "toro_rosso": '#469BFF',
-  "racing_point": '#F596C8',
-  "renault": '#FFF500',
-  "force_india": '#F27836',
-  "manor": '#006DC1',
 }
-
-export const team_theme = new Proxy(themes, {
-  get: (target, prop: string) => {
-    return target[prop] || '#fff';
-  }
-});
