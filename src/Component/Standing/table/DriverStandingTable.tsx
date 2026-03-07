@@ -1,8 +1,9 @@
 import { team_theme } from "../../../Lib/TeamTheme";
 import type { driverStanding_type } from "../../../Type/StandingTypes";
+import '../../../CSS/Table.css'
 
 type Props = {
-  driverStanding: driverStanding_type[]
+  driverStanding: Array<driverStanding_type>
 }
 
 function DriverStandingTableHeader() {
@@ -20,12 +21,12 @@ function DriverStandingTableBody({driverStanding}: Props) {
   return <tbody>
     {driverStanding.map((driver) => {
       return driver
-      ? <tr key={driver.positionText}>
-        <td>{driver.positionText}</td>
-        <td className="f1-style driverName-field" style={{textAlign: 'left'}} onClick={() => {window.open(driver.Driver.url)}}>
+      ? <tr key={driver.position} onClick={() => {window.open(driver.Driver.url)}}>
+        <td>{driver.position}</td>
+        <td className="f1-style driverName-field" style={{textAlign: 'left'}}>
           <span>
             {driver.Driver.givenName + ' '}
-            <span style={{color: team_theme[driver.Constructors[driver.Constructors.length - 1].constructorId], fontWeight: 'bold'}}>
+            <span style={{color: team_theme[driver.Constructors[0].constructorId], fontWeight: 'bold'}}>
               {driver.Driver.familyName.toUpperCase()}
             </span>
           </span>
@@ -40,12 +41,16 @@ function DriverStandingTableBody({driverStanding}: Props) {
 
 function DriverStandingTable({driverStanding}: Props) {
   return (
-    <table className="driverStanding-table">
-      <DriverStandingTableHeader />          
+    <div className="standings">
+      <h2 className="table-title">Driver Championship Standings</h2>
+      <table className="driverStanding-table">
+          <DriverStandingTableHeader />          
 
-      <DriverStandingTableBody driverStanding={driverStanding}/>
+          <DriverStandingTableBody driverStanding={driverStanding}/>
 
-    </table>
+      </table>
+    </div>
+
   );
 }
 
