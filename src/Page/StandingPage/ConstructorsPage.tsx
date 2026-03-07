@@ -12,7 +12,7 @@ function ConstructorsPage() {
   const [constructorStanding, setConstructorStanding] = useState<Array<constructorStanding_type>>([])
   const [schedule, setSchedule] = useState<Array<race_type>>([])
   const [errMessage, setErrMessage] = useState<string>('')
-  const year = 2007;
+  const year = 2025;
 
   useEffect(() => {
     getConstructorStanding(year).then((data) => {

@@ -12,7 +12,7 @@ function DriversPage() {
   const [driverStanding, setDriverStanding] = useState<Array<driverStanding_type>>([])
   const [schedule, setSchedule] = useState<Array<race_type>>([])
   const [errMessage, setErrMessage] = useState<string>('')
-  const year = 2010;
+  const year = 2025;
 
   useEffect(() => {
     getDriverStanding(year).then((data) => {
