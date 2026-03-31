@@ -1,166 +1,184 @@
 import json
 import urllib.parse
-import websocket
+import websockets
+import aiohttp
+import asyncio
 import requests
 import threading
 import time
 import datetime
 import logging
 
-current_session_path = ""
-should_restart = False
+logger = logging.getLogger(__name__)
 
-ws_global: websocket.WebSocketApp = None
 data_global: dict = None
 driver_global: dict = None
 last_driver_received: datetime.datetime = None
 
+current_session_path = ""
+_ws: websockets.WebSocketClientProtocol = None
+_loop: asyncio.AbstractEventLoop = None
+
 SUBS_TITLE = ["TimingData", "TimingStats", "TimingAppData", "CarData.z", "Position.z", "WeatherData", "TrackStatus", "ExtrapolatedClock", "RaceControlMessages", "TeamRadio", "LapCount", "SessionInfo"]
 
 
-def restart_wss():
+async def restart_wss():
 
-    global ws_global, should_restart
-    print("Restarting WebSocket connection due to session change...")
+    global _ws
+    logger.info("Restarting WebSocket connection...")
+    if _ws:
+        await _ws.close()
+        _ws = None
 
-    if ws_global:
-        ws_global.close()
-    
-    time.sleep(1)
-    should_restart = True
-
-def get_current_session_path():
+async def _get_current_session_path() -> str:
 
     try:
         url = "https://livetiming.formula1.com/static/SessionInfo.json"
-        res = requests.get(url)
-        if res.status_code == 200:
-            data = json.loads(res.content.decode('utf-8-sig'))
-            return data.get('Path', '')
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as res:
+                if res.status == 200:
+                    raw = await res.read()
+                    data = json.loads(raw.decode('utf-8-sig'))
+                    return data.get('Path', '')
     except Exception as e:
-        logging.error(f"Error fetching current session path: {e}")
+        logger.error(f"Error fetching current session path: {e}")
 
-def monitor_session():
+    return ""
+
+async def monitor_session():
+    """Monitor for session changes and trigger reconnection."""
+
+    global current_session_path
 
     while True:
-        time.sleep(60)
+        await asyncio.sleep(60)
         try:
-            active_path = get_current_session_path()
+            active_path = await _get_current_session_path()
 
             if not active_path or not current_session_path:
                 continue
 
             if active_path != current_session_path:
-                print(f"Session path changed from {current_session_path} to {active_path}")
-                restart_wss()
-
-                if not wss_thread.is_alive():
-                    wss_thread = threading.Thread(target=connect_wss, daemon=True)
-                    wss_thread.start()
+                logger.info(f"Session path changed from {current_session_path} to {active_path}")
+                await restart_wss()
 
         except Exception as e:
-            logging.error(f"Error monitoring session: {e}")
+            logger.error(f"Error monitoring session: {e}")
 
-def negotiate(hub):
+async def _negotiate(session: aiohttp, hub: str) -> tuple[str, str]:
+    """Negotiate a SignalR connection, return (token, cookie)."""
 
     url = f'https://livetiming.formula1.com/signalr/negotiate?connectionData={hub}&clientProtocol=1.5'
-    res = requests.get(url)
-    
-    if res.status_code != 200:
-        raise Exception(f"Failed to negotiate: {res.status_code} {res.text}")
 
-    res_content: dict = res.json()
-    res_headers = res.headers
-    token = res_content.get('ConnectionToken')
-    cookie = res_headers.get('Set-Cookie')
+    async with session.get(url) as res:
+    
+        if res.status != 200:
+            text = await res.text()
+            raise Exception(f"Failed to negotiate: {res.status} {text}")
+
+        res_content: dict = await res.json()
+        token = res_content.get('ConnectionToken')
+        cookie = res.headers.get('Set-Cookie')
 
     return token, cookie
 
-def connect_wss():
+async def connect_wss():
 
-    global ws_global
+    global data_global, driver_global, last_driver_received, _ws
     
-    name_json = [{"name": "Streaming"}]
-    hub = urllib.parse.quote(json.dumps(name_json))
+    hub = urllib.parse.quote(json.dumps([{"name": "Streaming"}]))
 
-    token, cookie = negotiate(hub)
-    endcodedToken = urllib.parse.quote(token)
-    url = f'wss://livetiming.formula1.com/signalr/connect?clientProtocol=1.5&transport=webSockets&connectionToken={endcodedToken}&connectionData={hub}'
+    while True:
 
-    headers = [
-        "User-Agent: BestHTTP",
-        "Accept-Encoding: gzip,identity",
-        f"Cookie: {cookie}"
-    ]
+        try: 
+            async with aiohttp.ClientSession() as session:
+                token, cookie = await _negotiate(session, hub)
+            
+            endcodedToken = urllib.parse.quote(token)
+            url = f'wss://livetiming.formula1.com/signalr/connect?clientProtocol=1.5&transport=webSockets&connectionToken={endcodedToken}&connectionData={hub}'
 
-    def on_open(ws: websocket.WebSocketApp):
-        print("WebSocket opened")
-        subscribe_titles = SUBS_TITLE.copy()
-        subscribe_titles.append("DriverList")
-        subscribe_titles.append("Heartbeat")
-        subscribe_msg = {
-            "H": "Streaming",
-            "M": "Subscribe",
-            "A": [subscribe_titles],
-            "I": 1
-        }
-        ws.send(json.dumps(subscribe_msg))
-        
-
-    def on_message(ws: websocket.WebSocketApp, message):
-        global data_global, driver_global, last_driver_received
-
-        # print("received Message: ", message[:100], "...")  # Print first 100 characters for brevity
-        msg_json = json.loads(message)
-        if msg_json.get('R'):
-
-            data_global = msg_json.get('R')
-            if data_global.get('DriverList'):
-                last_driver_received = datetime.datetime.now()
-                driver_global = data_global.get('DriverList')
-            else:
-                if (data_global is not None) and (driver_global is not None):
-                    data_global['DriverList'] = driver_global
-                else:
-                    raise Exception("DriverList not found in data_global and driver_global is None")
-            # print("Data received:", data_global)
-
-            subscribe_titles = SUBS_TITLE.copy()
-            if driver_global is None:
-                subscribe_titles.append("DriverList")
-            elif last_driver_received is None or (datetime.datetime.now() - last_driver_received).total_seconds() > 300:
-                print("DriverList is None or not received in the last 5 minutes, resubscribing")
-                subscribe_titles.append("DriverList")
-
-            subscribe_msg = {
-                "H": "Streaming",
-                "M": "Subscribe",
-                "A": [subscribe_titles],
-                "I": 1
+            headers = {
+                "User-Agent": "BestHTTP",
+                "Accept-Encoding": "gzip,identity",
+                "Cookie": cookie
             }
-            ws.send(json.dumps(subscribe_msg))
-            # print("Sent subscribe message")
 
-    def on_error(ws, error):
-        print("error:", error)
+            async with websockets.connect(url, additional_headers=headers, ping_interval=0.5) as ws:
+                _ws = ws
+                logger.info("WebSocket opened")
 
-    def on_close(ws, close_status_code, close_msg):
-        print("WebSocket closed")
+                # First subscribe to all titles including DriverList and Heartbeat
+                await ws.send(json.dumps({
+                    "H": "Streaming",
+                    "M": "Subscribe",
+                    "A": [SUBS_TITLE + ["DriverList", "Heartbeat"]],
+                    "I": 1,
+                }))
+                
+                # Then enter the message receiving loop
+                async for message in ws:
+                    msg_json = json.loads(message)
+                    if not msg_json.get('R'):
+                        continue
 
-    ws = websocket.WebSocketApp(
-        url,
-        header=headers,
-        on_open=on_open,
-        on_message=on_message,
-        on_error=on_error,
-        on_close=on_close
-    )
-    ws_global = ws
-    ws.run_forever(ping_interval=0.5)
+                    new_snapshot = data_global.copy() if data_global else {}
+                    new_data = msg_json['R']
+                    new_snapshot.update(new_data)
 
+                    if new_data.get('DriverList'):
+                        last_driver_received = datetime.datetime.now()
+                        driver_global = new_data.get('DriverList')
+                    elif driver_global is not None:
+                        new_snapshot['DriverList'] = driver_global
+                    else:
+                        logger.warning("DriverList not found and driver_global is None")
+                    # print("Data received:", data_global)
 
-wss_thread = threading.Thread(target=connect_wss, daemon=True)
-monitor_thread = threading.Thread(target=monitor_session, daemon=True)
+                    data_global = new_snapshot
+
+                    subscribe_titles = SUBS_TITLE.copy()
+                    if driver_global is None:
+                        subscribe_titles.append("DriverList")
+                    elif last_driver_received is None or (datetime.datetime.now() - last_driver_received).total_seconds() > 300:
+                        logger.info("DriverList is None or not received in the last 5 minutes, resubscribing")
+                        subscribe_titles.append("DriverList")
+
+                    await ws.send(json.dumps({
+                        "H": "Streaming",
+                        "M": "Subscribe",
+                        "A": [subscribe_titles],
+                        "I": 1,
+                    }))
+
+        except websockets.ConnectionClosed as e:
+            logger.warning("WebSocket closed: %s, reconnecting in 5s...", e)
+        except Exception as e:
+            logger.error("WebSocket error: %s, reconnecting in 5s...", e)
+
+        _ws = None
+        await asyncio.sleep(5)
+
+def _run_event_loop():
+    """Run the asyncio event loop in a dedicated thread."""
+
+    global _loop
+    _loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(_loop)
+    _loop.run_until_complete(asyncio.gather(
+        connect_wss(),
+        monitor_session(),
+    ))
+
+def is_connected() -> bool:
+    """Check if WebSocket is currently connected."""
+    return _ws is not None and _ws.open
+
+def schedule_restart():
+    """Schedule a WebSocket reconnect."""
+    if _loop and _loop.is_running():
+        asyncio.run_coroutine_threadsafe(restart_wss(), _loop)
+
 
 if __name__ == "__main__":
-    connect_wss()
+    logging.basicConfig(level=logging.INFO)
+    asyncio.run(asyncio.gather(connect_wss(), monitor_session()))

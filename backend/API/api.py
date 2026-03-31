@@ -2,94 +2,130 @@ import wss
 from data import *
 import liveTiming
 
-import os
+import asyncio
 import json
 import time
 import threading
 import logging
+from logging.handlers import RotatingFileHandler
 
 # import fastf1
 
-from flask import Flask, Response
-from flask_cors import CORS
+from quart import Quart, make_response
+from quart_cors import cors
 
 # from gevent.pywsgi import WSGIServer
 
-app = Flask(__name__)
-CORS(app, origins=['http://localhost:5173', 'https://immastersam.github.io'])
+app = Quart(__name__)
+app = cors(app, allow_origin=['http://localhost:5173', 'https://immastersam.github.io'])
+client_count = 0
+
+# logger settings
+file_handler = RotatingFileHandler(
+    'app.log', 
+    maxBytes=10*1024*1024,  # 10 MB
+    backupCount=3,          # 3 backup files
+    encoding='utf-8'
+)
+file_handler.setFormatter(logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - [%(funcName)s:%(lineno)d] %(message)s'
+))
+
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(logging.Formatter(
+    '%(asctime)s - %(levelname)s - %(message)s'
+))
+
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.INFO)
+root_logger.addHandler(file_handler)
+root_logger.addHandler(console_handler)
+
+@app.before_serving
+async def startup():
+    """Startup tasks to run before the server starts."""
+    root_logger.info("Starting up the API server...")
+
+    app.add_background_task(wss.connect_wss)
+    app.add_background_task(wss.monitor_session)
 
 @app.route('/stream')
-def stream():
+async def stream():
 
-    def iter_data():
-
+    async def iter_data():
         round = 9
-
         while True:
-            yield 'data:' + json.dumps(get_race(2025, round + 1, 'R')) + '\n\n'
-            time.sleep(5)
+            yield 'data:' + json.dumps(get_race(2026, round + 1, 'R')) + '\n\n'
+            await asyncio.sleep(5)
             round = (round + 1) % 10 
 
-    return Response(iter_data(), content_type='text/event-stream')
+    response = await make_response(iter_data())
+    response.timeout = None
+    response.headers['Content-Type'] = 'text/event-stream'
+    return response
 
 @app.route('/stream/time')
-def stream_time():
+async def stream_time():
 
-    def iter_data():
-
+    async def iter_data():
         while True:
             yield 'data:' + json.dumps({'time': time.strftime('%Y-%m-%d %H:%M:%S')}) + '\n\n'
-            time.sleep(1)
+            await asyncio.sleep(5)
 
-    return Response(iter_data(), content_type='text/event-stream')
-
-def check_wss():
-    """Check if the WebSocket connection is alive."""
-
-    if not wss.wss_thread.is_alive():
-        logging.warning('WebSocket thread is not alive, starting it now.')
-        wss.wss_thread = threading.Thread(target=wss.connect_wss, daemon=True)
-        wss.wss_thread.start()
-
-    if wss.ws_global is None:
-        wss.connect_wss()
+    response = await make_response(iter_data())
+    response.timeout = None
+    response.headers['Content-Type'] = 'text/event-stream'
+    return response
 
 @app.route('/stream/live')
-def stream_live():
+async def stream_live():
 
-    def iter_data():
-
-        check_wss()
+    async def iter_data():
         
+        global client_count
+
+        client_count += 1
+        app.logger.info(f"New client connected from SSE stream (Current clients: {client_count})")
+
+        # initial connection message
         yield f'data:{json.dumps({"type": "connected", "timestamp": time.time()})}\n\n'
 
-        while True:
+        try:
+            while True:
 
-            try:
-                live_data = liveTiming.get_live_timing()
-                if live_data is None:
-                    raise Exception("No live data available")
-                else:
-                    yield 'data:' + json.dumps(live_data) + '\n\n'
+                try:
+                    live_data = await asyncio.to_thread(liveTiming.get_live_timing)
+                    if live_data is None:
+                        raise Exception("No live data available")
+                    else:
+                        yield 'data:' + json.dumps(live_data) + '\n\n'
 
-            except Exception as e:
-                logging.error(f"Error in live timing stream: {e}")
-                yield 'data:' + json.dumps({"error": str(e)}) + '\n\n'
+                except Exception as e:
+                    root_logger.exception("Error in live timing stream")
+                    yield 'data:' + json.dumps({"error": str(e)}) + '\n\n'
 
-            time.sleep(1)
+                await asyncio.sleep(1)
+        except asyncio.CancelledError:
+            client_count -= 1
+            app.logger.info(f"Client disconnected from SSE stream (Remaining clients: {client_count})")
+            raise  
+        except Exception as e:
+            root_logger.exception("Unexpected error in SSE stream")
 
-    return Response(iter_data(), content_type='text/event-stream')
+    response = await make_response(iter_data())
+    response.timeout = None
+    response.headers['Content-Type'] = 'text/event-stream'
+    headers = {
+        'Cache-Control': 'no-cache',
+        'X-Accel-Buffering': 'no' # 針對 Nginx 等代理伺服器的優化
+    }
+    response.headers.update(headers)
+    return response
 
 if __name__ == '__main__':
 
     # 檢查並建立 cache 資料夾
-    if not os.path.exists('cache'):
-        os.makedirs('cache')
-
-    # fastf1.set_log_level('ERROR')
-    # fastf1.Cache.enable_cache('cache')
-
-    wss.wss_thread.start()
-    wss.monitor_thread.start()
+    # if not os.path.exists('cache'):
+    #     os.makedirs('cache')
 
     app.run(debug=True)

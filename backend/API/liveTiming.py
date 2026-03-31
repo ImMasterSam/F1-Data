@@ -7,10 +7,11 @@ from fastf1.events import Event
 import base64
 import zlib
 import json
-import pandas as pd
+import copy
 import datetime
 import threading
 import time
+import logging
 
 import wss
 
@@ -196,7 +197,7 @@ def get_drspit_info(driver_timing_info: dict, car_info: dict) -> dict:
     """Get the DRS info for a driver"""
 
     # DRS
-    DRS_ENABLED = {10, 12, 14}
+    # DRS_ENABLED = {10, 12, 14}
 
     drs_raw = car_info.get('45', 0)
     if drs_raw > 9:
@@ -222,7 +223,7 @@ def get_drspit_info(driver_timing_info: dict, car_info: dict) -> dict:
 
     return drspit_info
 
-def get_driver_status(driver_timing_info: dict, entries: int = 999) -> str:
+def get_driver_status(driver_timing_info: dict, entries: int = 999) -> dict:
     """Get the current status of a driver"""
 
     status = {'retired': driver_timing_info.get('Retired', True),
@@ -239,7 +240,7 @@ def get_current_tire_info(driver_number: str, tire_raw_data: dict) -> dict:
 
     try:
         last_stint = driver_tire_info.get('Stints', {})[-1]
-    except:
+    except (IndexError, TypeError):
         last_stint = {}
 
     compound = last_stint.get('Compound', 'UNKNOWN')
@@ -262,12 +263,15 @@ def get_gap_info(driver_timing_info: dict, session: str, session_part: str = '')
                      'toFront': driver_stats.get('TimeDifftoPositionAhead', '-- ---')}
 
     # Else they are in the timing data    
-    elif session == 'Race':
+    elif session == 'Race' or session == 'Sprint':
         gap_info = { 'toLeader': driver_timing_info.get('GapToLeader', '-- ---'),
                      'toFront': driver_timing_info.get('IntervalToPositionAhead', {'Value': '-- ---'}).get('Value', '-- ---')}
     elif session.startswith('Practice'):
         gap_info = { 'toLeader': driver_timing_info.get('TimeDiffToFastest', '-- ---'),
                      'toFront': driver_timing_info.get('TimeDiffToPositionAhead', '-- ---')}
+    else:
+        gap_info = { 'toLeader': '-- ---',
+                     'toFront': '-- ---'}
     
     return gap_info
 
@@ -369,29 +373,31 @@ def get_team_radio_info(radio_raw_data: dict, session_raw_data: dict, drivers_ra
 def get_live_timing() -> dict:
     """Get the live timing data from the WebSocket connection"""
 
-    global current_session
+    global current_session 
+    logger = logging.getLogger(__name__)
 
     # Load current session
     # session: Session = current_session.get('session')
 
+    snapshot = copy.deepcopy(wss.data_global)
+
     res = dict()
     
     try:
-        drivers_raw_data: dict = wss.data_global['DriverList']
-        timing_raw_data: dict = wss.data_global['TimingData']
-        stats_raw_data: dict = wss.data_global['TimingStats']
-        tire_raw_data: dict = wss.data_global['TimingAppData']
-        weather_raw_data: dict = wss.data_global['WeatherData']
-        trackStatus_raw_data: dict = wss.data_global['TrackStatus']
-        clock_raw_data: dict = wss.data_global.get('ExtrapolatedClock', {})
-        session_raw_data: dict = wss.data_global['SessionInfo']
-        car_raw_data: dict = wss.data_global.get('CarData.z', {})
-        pos_raw_data: dict = wss.data_global.get('Position.z', {})
-        raceControlMessages_raw_data: dict = wss.data_global.get('RaceControlMessages', {})
-        radio_raw_data: dict = wss.data_global.get('TeamRadio', {})
+        drivers_raw_data: dict = snapshot['DriverList']
+        timing_raw_data: dict = snapshot['TimingData']
+        stats_raw_data: dict = snapshot['TimingStats']
+        tire_raw_data: dict = snapshot['TimingAppData']
+        weather_raw_data: dict = snapshot['WeatherData']
+        trackStatus_raw_data: dict = snapshot['TrackStatus']
+        clock_raw_data: dict = snapshot.get('ExtrapolatedClock', {})
+        session_raw_data: dict = snapshot['SessionInfo']
+        car_raw_data: dict = snapshot.get('CarData.z', {})
+        pos_raw_data: dict = snapshot.get('Position.z', {})
+        raceControlMessages_raw_data: dict = snapshot.get('RaceControlMessages', {})
+        radio_raw_data: dict = snapshot.get('TeamRadio', {})
     except Exception as e:
-        print(f"Error retrieving live timing data: {e}")
-        print("No live data available yet")
+        logging.exception("Error retrieving live timing data")
         return res
     
     meeting_data: dict = session_raw_data.get('Meeting', {})
@@ -404,9 +410,8 @@ def get_live_timing() -> dict:
     
     # update current session
     if update_current_session(res['grandPrixName'], session_type):
-        wss.wss_thread = threading.Thread(target=wss.connect_wss, daemon=True)
-        wss.wss_thread.start()
-        print("Current session updated successfully.")
+        wss.schedule_restart()
+        logger.info("Current session updated successfully.")
     
     position_data = decompressed_posData(pos_raw_data)
     res['circuit'] = get_circuit_info(meeting_data, position_data, drivers_raw_data, timing_raw_data)
@@ -427,29 +432,29 @@ def get_live_timing() -> dict:
 
     # Race handling
     if session_type == 'Race':
-        lapCount_raw_data: dict = wss.data_global['LapCount']
+        lapCount_raw_data: dict = snapshot['LapCount']
         res['other'] = { 'currentLap': int(lapCount_raw_data.get('CurrentLap', 0)),
-                         'totalLaps': int(lapCount_raw_data.get('TotalLaps', 0))}
+                        'totalLaps': int(lapCount_raw_data.get('TotalLaps', 0))}
         
     # Get car data
     car_data = decompressed_carData(car_raw_data)
 
     # Get evey driver's current result
     result_list = []
-    for (driverNumber, data) in timing_raw_data.get('Lines', ).items():
+    for (driverNumber, data) in timing_raw_data.get('Lines', {}).items():
 
         driver_timing_info = timing_raw_data.get('Lines', {}).get(driverNumber, {})
         driver_stats_info = stats_raw_data.get('Lines', {}).get(driverNumber, {})
         car_info = car_data.get(driverNumber, {}).get('Channels', {})
 
         driver_result = { 'driver': get_driver_info(driverNumber, drivers_raw_data),
-                          'position': int(data.get('Position', 9999)),
-                          'drspit': get_drspit_info(driver_timing_info, car_info),
-                          'status': get_driver_status(driver_timing_info, entries),
-                          'tire': get_current_tire_info(driverNumber, tire_raw_data),
-                          'Gap': get_gap_info(driver_timing_info, session_type, session_part),
-                          'lapTime': get_lap_info(driver_stats_info, driver_timing_info),
-                          'sectors': get_sector_info(driver_stats_info, driver_timing_info)}
+                        'position': int(data.get('Position', 9999)),
+                        'drspit': get_drspit_info(driver_timing_info, car_info),
+                        'status': get_driver_status(driver_timing_info, entries),
+                        'tire': get_current_tire_info(driverNumber, tire_raw_data),
+                        'Gap': get_gap_info(driver_timing_info, session_type, session_part),
+                        'lapTime': get_lap_info(driver_stats_info, driver_timing_info),
+                        'sectors': get_sector_info(driver_stats_info, driver_timing_info)}
         
         result_list.append(driver_result)
 
@@ -458,7 +463,7 @@ def get_live_timing() -> dict:
 
     # Get the current track status
     res['trackStatus'] = { 'status': int(trackStatus_raw_data.get('Status', '0')),
-                           'message': trackStatus_raw_data.get('Message', 'Unknown')}
+                        'message': trackStatus_raw_data.get('Message', 'Unknown')}
 
     # Get the current weather info
     res['weather'] = get_weather_info(weather_raw_data)
