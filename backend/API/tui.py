@@ -38,16 +38,21 @@ class HardwarePanel(Static):
     """Panel to display hardware usage."""
     cpu = reactive(0.0)
     ram = reactive(0.0)
+    ram_total = reactive(0.0)
 
     def on_mount(self):
         self.set_interval(1.0, self.update_stats)
 
     def update_stats(self):
         self.cpu = psutil.cpu_percent()
-        self.ram = psutil.virtual_memory().percent
+        self.ram = psutil.virtual_memory().used / (1024 ** 3)
+        self.ram_total = psutil.virtual_memory().total / (1024 ** 3)
     
     def render(self):
-        return f"CPU Usage: {self.cpu}%\nMemory Usage: {self.ram}%"
+        return (
+            f"CPU Usage: {self.cpu} %\n\n"
+            f"Memory Usage: {self.ram:.2f} / {self.ram_total:.2f} GB"
+        )
     
 class DataPanel(Static):
     """Panel to display current session and client count."""
@@ -77,7 +82,6 @@ class APIDashboard(App):
     #left_column {
         width: 40%;
         height: 100%;
-        padding: 1 2;
         border-right: solid green;
     }
     
@@ -86,15 +90,19 @@ class APIDashboard(App):
         height: 100%;
     }
     
-    HardwarePanel, DataPanel {
-        height: 50%;
+    HardwarePanel {
+        height: 30%;
         border: solid dodgerblue;
         padding: 1 2;
         content-align: left middle;
-    }
-    
-    HardwarePanel {
         border-title-color: cyan;
+    }
+
+    DataPanel {
+        height: 70%;
+        border: solid dodgerblue;
+        padding: 1 2;
+        content-align: left middle;
     }
     """
 
@@ -115,7 +123,6 @@ class APIDashboard(App):
 
             with Vertical(id="right_column"):
                 self.log_view = RichLog(id="log_view", highlight=True, wrap=True, markup=True)
-                self.log_view.border_title = "Logs"
                 yield self.log_view
 
         yield Footer()

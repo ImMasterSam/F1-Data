@@ -95,7 +95,7 @@ async def stream_live():
             while True:
 
                 try:
-                    live_data = await asyncio.to_thread(liveTiming.get_live_timing)
+                    live_data = liveTiming.get_live_timing()
                     if live_data is None:
                         raise Exception("No live data available")
                     else:
