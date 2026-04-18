@@ -9,6 +9,8 @@ import time
 import datetime
 import logging
 
+from state import app_state
+
 logger = logging.getLogger(__name__)
 
 data_global: dict = None
@@ -54,6 +56,10 @@ async def monitor_session():
         await asyncio.sleep(60)
         try:
             active_path = await _get_current_session_path()
+
+            app_state.last_path_time = datetime.datetime.now()
+            if active_path:
+                app_state.current_session = active_path
 
             if not active_path or not current_session_path:
                 continue
@@ -120,6 +126,8 @@ async def connect_wss():
                     msg_json = json.loads(message)
                     if not msg_json.get('R'):
                         continue
+
+                    app_state.last_wss_update = datetime.datetime.now()
 
                     new_snapshot = data_global.copy() if data_global else {}
                     new_data = msg_json['R']
