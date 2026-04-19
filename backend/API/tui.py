@@ -131,16 +131,20 @@ class APIDashboard(App):
         """Run the Quart server in the background."""
         config = Config()
         config.bind = ["127.0.0.1:5000"]
-        config.accesslog = logging.getLogger()
-        config.errorlog = logging.getLogger()
+        
+        root_logger = logging.getLogger()
+        config.accesslog = root_logger
+        config.errorlog = root_logger
 
-        hypercorn_logger = logging.getLogger("hypercorn.error")
         class IgnoreAppPutFilter(logging.Filter):
             def filter(self, record):
-                if record.exc_text and "'HTTPStream' object has no attribute 'app_put'" in record.exc_text:
-                    return False
+                if record.exc_info:
+                    exc_type, exc_value, exc_tb = record.exc_info
+                    if exc_value and "'HTTPStream' object has no attribute 'app_put'" in str(exc_value):
+                        return False
                 return True
-        hypercorn_logger.addFilter(IgnoreAppPutFilter())
+                
+        root_logger.addFilter(IgnoreAppPutFilter())
 
         try:
             await hypercorn.asyncio.serve(quart_app, config)
