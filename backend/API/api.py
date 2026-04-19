@@ -9,6 +9,8 @@ import threading
 import logging
 from logging.handlers import RotatingFileHandler
 
+from state import app_state
+
 # import fastf1
 
 from quart import Quart, make_response
@@ -18,7 +20,6 @@ from quart_cors import cors
 
 app = Quart(__name__)
 app = cors(app, allow_origin=['http://localhost:5173', 'https://immastersam.github.io'])
-client_count = 0
 
 # logger settings
 file_handler = RotatingFileHandler(
@@ -84,8 +85,8 @@ async def stream_live():
         
         global client_count
 
-        client_count += 1
-        app.logger.info(f"New client connected from SSE stream (Current clients: {client_count})")
+        app_state.client_count += 1
+        app.logger.info(f"New client connected from SSE stream (Current clients: {app_state.client_count})")
 
         # initial connection message
         yield f'data:{json.dumps({"type": "connected", "timestamp": time.time()})}\n\n'
@@ -94,7 +95,7 @@ async def stream_live():
             while True:
 
                 try:
-                    live_data = await asyncio.to_thread(liveTiming.get_live_timing)
+                    live_data = liveTiming.get_live_timing()
                     if live_data is None:
                         raise Exception("No live data available")
                     else:
@@ -105,10 +106,10 @@ async def stream_live():
                     yield 'data:' + json.dumps({"error": str(e)}) + '\n\n'
 
                 await asyncio.sleep(1)
-        except asyncio.CancelledError:
-            client_count -= 1
-            app.logger.info(f"Client disconnected from SSE stream (Remaining clients: {client_count})")
-            raise  
+        except (asyncio.CancelledError, GeneratorExit):
+            app_state.client_count -= 1
+            app.logger.info(f"Client disconnected from SSE stream (Remaining clients: {app_state.client_count})")
+            return 
         except Exception as e:
             root_logger.exception("Unexpected error in SSE stream")
 
@@ -117,7 +118,7 @@ async def stream_live():
     response.headers['Content-Type'] = 'text/event-stream'
     headers = {
         'Cache-Control': 'no-cache',
-        'X-Accel-Buffering': 'no' # 針對 Nginx 等代理伺服器的優化
+        'X-Accel-Buffering': 'no' # Optional: Disable buffering for Nginx if used as a reverse proxy
     }
     response.headers.update(headers)
     return response

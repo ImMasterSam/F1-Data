@@ -240,7 +240,7 @@ def get_current_tire_info(driver_number: str, tire_raw_data: dict) -> dict:
 
     try:
         last_stint = driver_tire_info.get('Stints', {})[-1]
-    except (IndexError, TypeError):
+    except (IndexError, TypeError, KeyError):
         last_stint = {}
 
     compound = last_stint.get('Compound', 'UNKNOWN')

@@ -9,6 +9,8 @@ import time
 import datetime
 import logging
 
+from state import app_state
+
 logger = logging.getLogger(__name__)
 
 data_global: dict = None
@@ -24,8 +26,15 @@ SUBS_TITLE = ["TimingData", "TimingStats", "TimingAppData", "CarData.z", "Positi
 
 async def restart_wss():
 
+    global _ws, data_global, driver_global, last_driver_received
+
     global _ws
     logger.info("Restarting WebSocket connection...")
+    
+    data_global = None 
+    driver_global = None
+    last_driver_received = None
+
     if _ws:
         await _ws.close()
         _ws = None
@@ -55,11 +64,22 @@ async def monitor_session():
         try:
             active_path = await _get_current_session_path()
 
+            app_state.last_path_time = datetime.datetime.now()
+            if active_path:
+                app_state.current_session = active_path
+
             if not active_path or not current_session_path:
                 continue
 
+            data_session_path = data_global.get('SessionInfo', {}).get('Path') if data_global else None
+
             if active_path != current_session_path:
                 logger.info(f"Session path changed from {current_session_path} to {active_path}")
+                current_session_path = active_path
+                await restart_wss()
+            elif data_session_path and data_session_path != active_path:
+                logger.warning(f"Data session path {data_session_path} does not match active session path {active_path}, restarting WebSocket")
+                current_session_path = active_path
                 await restart_wss()
 
         except Exception as e:
@@ -103,7 +123,9 @@ async def connect_wss():
                 "Cookie": cookie
             }
 
-            async with websockets.connect(url, additional_headers=headers, ping_interval=0.5) as ws:
+            received_count = 0
+
+            async with websockets.connect(url, additional_headers=headers, ping_interval=1) as ws:
                 _ws = ws
                 logger.info("WebSocket opened")
 
@@ -120,6 +142,11 @@ async def connect_wss():
                     msg_json = json.loads(message)
                     if not msg_json.get('R'):
                         continue
+
+                    received_count += 1
+                    print(received_count)
+
+                    app_state.last_wss_update = datetime.datetime.now()
 
                     new_snapshot = data_global.copy() if data_global else {}
                     new_data = msg_json['R']
@@ -138,10 +165,13 @@ async def connect_wss():
 
                     subscribe_titles = SUBS_TITLE.copy()
                     if driver_global is None:
+                        logger.warning("DriverList is None, adding to subscribe list")
                         subscribe_titles.append("DriverList")
-                    elif last_driver_received is None or (datetime.datetime.now() - last_driver_received).total_seconds() > 300:
-                        logger.info("DriverList is None or not received in the last 5 minutes, resubscribing")
-                        subscribe_titles.append("DriverList")
+                    # elif last_driver_received is None or (datetime.datetime.now() - last_driver_received).total_seconds() > 300:
+                    #     logger.info("DriverList is None or not received in the last 5 minutes, resubscribing")
+                    #     subscribe_titles.append("DriverList")
+
+                    await asyncio.sleep(0.5)
 
                     await ws.send(json.dumps({
                         "H": "Streaming",
@@ -156,6 +186,7 @@ async def connect_wss():
             logger.error("WebSocket error: %s, reconnecting in 5s...", e)
 
         _ws = None
+        logger.info("WebSocket connection closed")
         await asyncio.sleep(5)
 
 def _run_event_loop():
@@ -178,7 +209,10 @@ def schedule_restart():
     if _loop and _loop.is_running():
         asyncio.run_coroutine_threadsafe(restart_wss(), _loop)
 
+async def main():
+    await asyncio.gather(connect_wss(), monitor_session())
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    asyncio.run(asyncio.gather(connect_wss(), monitor_session()))
+    asyncio.run(main())
