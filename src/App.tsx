@@ -17,7 +17,7 @@ function App() {
         <div className='main-container'>
 
             <div className='main-title'>
-              <h1>F1 Data Analysis</h1>
+              <h1>F1 Laboratory</h1>
               <a href='https://github.com/ImMasterSam/F1-Data' target="_blank" rel="noopener noreferrer">
                 <FaGithub />
               </a>
