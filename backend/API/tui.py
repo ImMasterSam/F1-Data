@@ -133,6 +133,15 @@ class APIDashboard(App):
         config.bind = ["127.0.0.1:5000"]
         config.accesslog = logging.getLogger()
         config.errorlog = logging.getLogger()
+
+        hypercorn_logger = logging.getLogger("hypercorn.error")
+        class IgnoreAppPutFilter(logging.Filter):
+            def filter(self, record):
+                if record.exc_text and "'HTTPStream' object has no attribute 'app_put'" in record.exc_text:
+                    return False
+                return True
+        hypercorn_logger.addFilter(IgnoreAppPutFilter())
+
         try:
             await hypercorn.asyncio.serve(quart_app, config)
         except Exception as e:
