@@ -106,10 +106,10 @@ async def stream_live():
                     yield 'data:' + json.dumps({"error": str(e)}) + '\n\n'
 
                 await asyncio.sleep(1)
-        except asyncio.CancelledError:
+        except (asyncio.CancelledError, GeneratorExit):
             app_state.client_count -= 1
             app.logger.info(f"Client disconnected from SSE stream (Remaining clients: {app_state.client_count})")
-            raise  
+            return 
         except Exception as e:
             root_logger.exception("Unexpected error in SSE stream")
 
