@@ -42,7 +42,7 @@ function HomePage() {
         <p className="hero-subtitle">
           Data Science for Formula 1 data
         </p>
-        <a href="https://github.com/ImMasterSam/F1-Data" target="_blank" rel="noreferrer" className="github-btn">
+        <a href="https://github.com/ImMasterSam/F1-Laboratory" target="_blank" rel="noreferrer" className="github-btn">
           View on GitHub
         </a>
       </section>
