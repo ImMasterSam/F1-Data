@@ -1,6 +1,6 @@
-# F1 Data Analysis
+# F1 Laboratory
 
-## Website - [F1 Data](https://immastersam.github.io/F1-Data/)
+## Website - [F1 Laboratory](https://immastersam.github.io/F1-Laboratory/)
 
 ### Live Timing Data
 ![Live Timing](/public/image/Live%20Timing%20Page.png)
@@ -25,9 +25,14 @@ npm run dev
 ```
 
 ### Backend - api
+We use [**uv**](https://pypi.org/project/uv/) to manage the Python environment and dependencies. You can install it using pip:
 ```sh
-pip install -r requirements.txt
-python api.py
+pip install uv
+```
+Then, you can run the API using the following command:
+```sh
+uv sync
+uv run tui.py
 ```
 
 ---

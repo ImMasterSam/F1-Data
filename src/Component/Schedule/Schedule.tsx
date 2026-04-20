@@ -14,6 +14,21 @@ function Schedule({year}: Props) {
   const [selectedTrack, setSelectedTrack] = useState<number>(0)
   const [errMessage, setErrMessage] = useState<string>('')
 
+  const setInitTrack = () =>{
+    const now = new Date()
+
+    const nextRaceIndex = scheduleList.findIndex((race) => {
+      const raceDateTime = new Date(`${race.date}T${race.time}`)
+      return raceDateTime > now
+    })
+
+    if (nextRaceIndex !== -1)
+      handleSelectedTrack(nextRaceIndex)
+    else
+      handleSelectedTrack(0)
+
+  }
+
   const handleSelectedTrack = (idx: number) => {
     setSelectedTrack(idx)
   }
@@ -22,8 +37,11 @@ function Schedule({year}: Props) {
     fetchScheduleList(year).then((data) => {
       setSchedulelist(data)
     }).catch((error) => {setErrMessage(error)})
-    handleSelectedTrack(0)
   }, [year])
+
+  useEffect(() => {
+    setInitTrack()
+  }, [scheduleList])
 
   return (
     <div className="schedule-container">

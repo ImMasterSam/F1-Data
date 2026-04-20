@@ -72,7 +72,7 @@
 }
 
 .race-control {
-  width: 50%;
+  flex: 1;
   height: 100%;
   padding: 5px;
   display: flex;
@@ -123,7 +123,7 @@
 }
 
 .radio-panel {
-  width: 50%;
+  flex: 1;
   height: 100%;
   padding: 5px;
   display: flex;
