@@ -118,7 +118,7 @@ def update_all_standings() -> None:
                 break
             except RateLimitExceededError as e:
                 logger.warning(f"Rate limit hit while updating standings for year {year}: {e}. Retrying after delay.")
-                sleep(3600)  # Wait before retrying
+                sleep(3610)  # Wait before retrying
             except Exception as e:
                 logger.error(f"Error updating standings for year {year}: {e}")
                 sleep(60)  # Wait before retrying
@@ -132,11 +132,10 @@ def update_all_standings() -> None:
         with open(os.path.join(CACHE_DIR, 'constructor_standings.json'), 'w') as f:
             json.dump(all_constructor_standings, f, indent=4)
 
-if __name__ == "__main__":
-    # schedule.every().day.at("00:00").do(update_all_standings)
+async def daily_updater():
+    """Schedules the update of standings to run daily at midnight"""
+    schedule.every().day.at("00:00").do(update_all_standings)
     
-    # while True:
-    #     schedule.run_pending()
-    #     sleep(60)
-
-    update_all_standings()
+    while True:
+        schedule.run_pending()
+        await asyncio.sleep(60)  # Check every minute for pending tasks
