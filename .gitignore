@@ -29,3 +29,8 @@ test.*
 *.njsproj
 *.sln
 *.sw?
+
+# AI Agents
+skills-lock.json
+.agents/
+.reviews/
